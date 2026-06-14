@@ -83,7 +83,6 @@ function AdmissionPage() {
                   <Badge className="gradient-primary border-0 text-primary-foreground gap-1">
                     <Sparkles className="h-3 w-3" /> Smart Form
                   </Badge>
-                  <Button variant = "outlined">fdsfdsf</Button>
                 </>
               }
             />
