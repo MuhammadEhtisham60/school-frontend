@@ -1,0 +1,26 @@
+import { Section } from "./Section";
+import {
+  FormikText,
+  FormikDatePicker,
+  FormikRadio,
+  FormikFile,
+} from "@/components/common/sharedfields";
+
+export function PersonalInformation() {
+  return (
+    <Section title="Basic Information" desc="Student's personal details">
+      <FormikText name="fullName" label="Full Name" placeholder="e.g. Ali Khan" required />
+      <FormikText name="fatherName" label="Father's Name" placeholder="e.g. Ahmed Khan" required />
+      <FormikText name="rollNo" label="Roll Number" placeholder="Auto / Manual" />
+      <FormikDatePicker name="dob" label="Date of Birth" required />
+      <FormikRadio
+        name="gender"
+        label="Gender"
+        required
+        options={["Male", "Female", "Other"]}
+      />
+      <FormikText name="cnic" label="B-Form / CNIC" placeholder="12345-1234567-1" />
+      <FormikFile name="photo" label="Profile Photo" />
+    </Section>
+  );
+}
