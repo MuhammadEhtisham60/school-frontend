@@ -1,6 +1,6 @@
 import React from "react";
 import { DashboardPage } from "@/pages/Management/Dashboard";
-import { AdmissionPage, StudentsPage, AttendancePage } from "@/pages/Management/Students";
+import { AdmissionPage, StudentsPage, AttendancePage, StudentDetailsPage } from "@/pages/Management/Students";
 import { TeachersPage, AccountantPage, AdminsPage, UsersPage, RoleUsersPage } from "@/pages/Management/Employees";
 import { ClassRoutinePage, SubjectsPage, ExamPage, ResultPage } from "@/pages/Management/Academics";
 import { FileManagerPage, LibraryPage, PaperCollectionPage, EventCalendarPage, NoticePage, ReportsPage } from "@/pages/Management/Resources";
@@ -21,8 +21,16 @@ export const privateRoutes = [
         element: <AdmissionPage />
       },
       {
+        path: "/admission/:id",
+        element: <AdmissionPage />
+      },
+      {
         path: "/students",
         element: <StudentsPage />
+      },
+      {
+        path: "/students/details/:id",
+        element: <StudentDetailsPage />
       },
       {
         path: "/teachers",

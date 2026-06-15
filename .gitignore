@@ -21,7 +21,8 @@ dist-ssr
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
-
+mdfiles/
+/mdfiles
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

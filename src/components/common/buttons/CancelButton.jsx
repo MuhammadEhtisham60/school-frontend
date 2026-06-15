@@ -41,6 +41,7 @@ export const CancelButton = React.forwardRef(({
           borderColor: "text.secondary",
           backgroundColor: "action.hover",
         },
+        borderRadius: '8px',
         ...sx,
       }}
       {...props}

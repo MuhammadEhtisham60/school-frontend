@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Formik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,11 @@ import { Progress } from "@/components/ui/progress";
 import { PrimaryButton, CancelButton } from "@/components/common/buttons";
 import { cn } from "@/utils/utils";
 import { toast } from "sonner";
-import { useCreateStudentMutation } from "@/services/private/studentService";
+import {
+  useCreateStudentMutation,
+  useGetStudentQuery,
+  useUpdateStudentMutation,
+} from "@/services/private/studentService";
 import {
   User,
   BookOpen,
@@ -23,6 +27,7 @@ import {
   ChevronRight,
   Save,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { initialValues, validationSchema } from "./util/helpers";
 import {
@@ -47,18 +52,79 @@ const steps = [
 ];
 
 function AdmissionPage() {
+  const { id } = useParams();
+  const isEditMode = !!id;
   const [step, setStep] = useState(1);
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
-  const [createStudent, { isLoading }] = useCreateStudentMutation();
+
+  const { data: studentData, isLoading: isStudentLoading } = useGetStudentQuery(id, { skip: !isEditMode });
+  const student = studentData?.student;
+
+  const [createStudent, { isLoading: isCreating }] = useCreateStudentMutation();
+  const [updateStudent, { isLoading: isUpdating }] = useUpdateStudentMutation();
+  const isLoading = isCreating || isUpdating;
+
   const progress = (step / steps.length) * 100;
   const next = () => setStep((s) => Math.min(s + 1, steps.length));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
 
+  const getFormValues = () => {
+    if (!isEditMode || !student) {
+      return initialValues;
+    }
+    return {
+      fullName: student.fullName || "",
+      fatherName: student.fatherName || "",
+      rollNo: student.rollNo || "",
+      dob: student.dob || "",
+      gender: student.gender || "",
+      cnic: student.cnic || "",
+      photo: null,
+      class: student.class || "",
+      section: student.section || "",
+      prevSchool: student.prevSchool || "",
+      lastResult: student.lastResult || "",
+      admissionDate: student.admissionDate || "",
+      mobile: student.mobile || "",
+      altContact: student.altContact || "",
+      email: student.email || "",
+      city: student.city || "",
+      address: student.address || "",
+      fatherFullName: student.fatherFullName || "",
+      fatherCNIC: student.fatherCNIC || "",
+      occupation: student.occupation || "",
+      fatherPhone: student.fatherPhone || "",
+      motherName: student.motherName || "",
+      motherPhone: student.motherPhone || "",
+      blood: student.blood || "",
+      emergency: student.emergency || "",
+      medical: student.medical || "",
+      disability: student.disability || "",
+      transport: student.transport || false,
+      busRoute: student.busRoute || "",
+      hostel: student.hostel || false,
+      studentPhoto: null,
+      bFormCopy: null,
+      prevResultCard: null,
+      guardianCnic: null,
+    };
+  };
+
+  if (isEditMode && isStudentLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground font-medium">Loading student details...</p>
+      </div>
+    );
+  }
+
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={getFormValues()}
       validationSchema={validationSchema}
+      enableReinitialize
       onSubmit={async (values, { resetForm }) => {
         try {
           const formData = new FormData();
@@ -67,10 +133,15 @@ function AdmissionPage() {
               formData.append(key, value);
             }
           });
-          await createStudent(formData).unwrap();
-          toast.success("Admission submitted successfully!", {
-            description: `${values.fullName || "Student"} has been enrolled.`,
-          });
+          if (isEditMode) {
+            await updateStudent({ id, formData }).unwrap();
+            toast.success("Student details updated successfully!");
+          } else {
+            await createStudent(formData).unwrap();
+            toast.success("Admission submitted successfully!", {
+              description: `${values.fullName || "Student"} has been enrolled.`,
+            });
+          }
           setStep(1);
           setPreview(false);
           resetForm();
@@ -88,9 +159,13 @@ function AdmissionPage() {
         return (
           <div className="space-y-6">
             <PageHeader
-              eyebrow="Admissions"
-              title="New Student Admission"
-              description="Complete the 7-step form to enroll a new student. All sections are validated before submission."
+              eyebrow={isEditMode ? "Update Profile" : "Admissions"}
+              title={isEditMode ? "Edit Student Details" : "New Student Admission"}
+              description={
+                isEditMode
+                  ? "Update the student information across the step-by-step form."
+                  : "Complete the 7-step form to enroll a new student. All sections are validated before submission."
+              }
               actions={
                 <>
                   <CancelButton onClick={handleDraft} startIcon={<Save className="h-4 w-4" />}>
