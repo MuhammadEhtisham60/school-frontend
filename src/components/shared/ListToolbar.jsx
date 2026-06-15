@@ -35,19 +35,21 @@ export function ListToolbar({ search, setSearch, onAdd, addLabel, children }) {
   );
 }
 export function StatusBadge({ status }) {
+  const s = status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "";
   const map = {
     Active: "bg-success/15 text-success border-success/30",
     Inactive: "bg-muted text-muted-foreground border-border",
     Paid: "bg-success/15 text-success border-success/30",
     Pending: "bg-warning/15 text-warning-foreground border-warning/30",
     Overdue: "bg-destructive/15 text-destructive border-destructive/30",
+    Partial: "bg-info/15 text-info border-info/30",
   };
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${map[status] ?? "bg-muted text-muted-foreground border-border"}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${map[s] ?? "bg-muted text-muted-foreground border-border"}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {status}
+      {s}
     </span>
   );
 }

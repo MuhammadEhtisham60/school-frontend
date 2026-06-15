@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetStudentQuery } from "@/services/private/studentService";
+import {
+  useGetStudentQuery,
+} from "@/services/private/studentService";
+import {
+  useGetStudentFeesListQuery,
+  useCreateFeeMutation,
+  useUpdateFeeMutation,
+  useDeleteFeeMutation,
+} from "@/services/private/feeService";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,7 +30,21 @@ import {
   ArrowLeft,
   DollarSign,
   GraduationCap,
+  CreditCard,
+  Plus,
+  Trash2,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const getMediaUrl = (path) => {
   if (!path) return "";
@@ -48,6 +70,160 @@ export default function StudentDetailsPage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetStudentQuery(id, { skip: !id });
   const student = data?.student;
+
+  // Fee State Modals & Selection
+  const [selectedFee, setSelectedFee] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPayOpen, setIsPayOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+
+  // Form states for Add Month Fee
+  const [addForm, setAddForm] = useState({
+    month: "",
+    amount: "",
+    paymentDate: new Date().toISOString().split("T")[0],
+    paymentMethod: "Cash",
+    status: "Paid",
+    remarks: "",
+  });
+
+  // Form states for Edit Fee
+  const [editForm, setEditForm] = useState({
+    amount: "",
+    paymentDate: "",
+    paymentMethod: "Cash",
+    status: "Paid",
+    remarks: "",
+  });
+
+  // Form states for Pay Fee
+  const [payForm, setPayForm] = useState({
+    paymentDate: new Date().toISOString().split("T")[0],
+    paymentMethod: "Cash",
+    remarks: "",
+  });
+
+  // API mutations & query
+  const { data: feesData, isLoading: isFeesLoading, error: feesError } = useGetStudentFeesListQuery(id, { skip: !id });
+  const [createFee, { isLoading: isCreatingFee }] = useCreateFeeMutation();
+  const [updateFee, { isLoading: isUpdatingFee }] = useUpdateFeeMutation();
+  const [deleteFee, { isLoading: isDeletingFee }] = useDeleteFeeMutation();
+
+  const handleOpenEdit = (fee) => {
+    setSelectedFee(fee);
+    setEditForm({
+      amount: fee.amount ?? 0,
+      paymentDate: fee.paymentDate ?? new Date().toISOString().split("T")[0],
+      paymentMethod: fee.paymentMethod ?? "Cash",
+      status: fee.status ?? "Paid",
+      remarks: fee.remarks ?? "",
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleOpenPay = (fee) => {
+    setSelectedFee(fee);
+    setPayForm({
+      paymentDate: new Date().toISOString().split("T")[0],
+      paymentMethod: "Cash",
+      remarks: "",
+    });
+    setIsPayOpen(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateFee({
+        id: selectedFee.id,
+        body: {
+          amount: Number(editForm.amount),
+          paymentDate: editForm.paymentDate,
+          paymentMethod: editForm.paymentMethod,
+          status: editForm.status,
+          remarks: editForm.remarks,
+        },
+        studentId: id,
+      }).unwrap();
+      toast.success(`Fee details for ${selectedFee.month} updated successfully`);
+      setIsEditOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update monthly fee details");
+    }
+  };
+
+  const handleSavePay = async (e) => {
+    e.preventDefault();
+    try {
+      await updateFee({
+        id: selectedFee.id,
+        body: {
+          amount: selectedFee.amount,
+          paymentDate: payForm.paymentDate,
+          paymentMethod: payForm.paymentMethod,
+          status: "Paid",
+          remarks: payForm.remarks,
+        },
+        studentId: id,
+      }).unwrap();
+      toast.success(`Payment recorded successfully for ${selectedFee.month}`);
+      setIsPayOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to record fee payment");
+    }
+  };
+
+  const handleSaveAdd = async (e) => {
+    e.preventDefault();
+    if (!addForm.month) {
+      toast.error("Please select a month");
+      return;
+    }
+    try {
+      await createFee({
+        studentId: id,
+        month: addForm.month,
+        amount: Number(addForm.amount),
+        paymentDate: addForm.paymentDate,
+        paymentMethod: addForm.paymentMethod,
+        status: addForm.status,
+        remarks: addForm.remarks,
+      }).unwrap();
+      toast.success(`Fee record created for ${addForm.month}`);
+      setIsAddOpen(false);
+      setAddForm({
+        month: "",
+        amount: "",
+        paymentDate: new Date().toISOString().split("T")[0],
+        paymentMethod: "Cash",
+        status: "Paid",
+        remarks: "",
+      });
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to add monthly fee");
+    }
+  };
+
+  const handleDeleteFee = async (feeId, monthName) => {
+    if (!window.confirm(`Are you sure you want to delete the fee record for ${monthName}?`)) {
+      return;
+    }
+    try {
+      await deleteFee({ id: feeId, studentId: id }).unwrap();
+      toast.success(`Fee record for ${monthName} deleted successfully`);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete fee record");
+    }
+  };
+
+  const feeRecords = feesData?.data || [];
+  const totalBilled = feeRecords.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
+  const totalPaid = feeRecords.reduce((acc, f) => acc + (f.status?.toLowerCase() === "paid" ? (Number(f.amount) || 0) : 0), 0);
+  const totalDue = feeRecords.reduce((acc, f) => acc + (f.status?.toLowerCase() === "pending" ? (Number(f.amount) || 0) : 0), 0);
+
+  const MONTHS_ORDER = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const configuredMonths = new Set(feeRecords.map((f) => f.month.trim().toLowerCase()));
+  const availableMonths = MONTHS_ORDER.filter((m) => !configuredMonths.has(m.toLowerCase()));
 
   if (isLoading) {
     return (
@@ -220,56 +396,151 @@ export default function StudentDetailsPage() {
               <StatusBadge status={student.feeStatus || "Paid"} />
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              <div className="grid sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl border bg-muted/20">
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Fee Status</p>
-                  <p className="text-xl font-bold mt-1 text-primary">{student.feeStatus || "Paid"}</p>
+              {isFeesLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary animate-pulse" />
+                  <p className="text-xs text-muted-foreground font-semibold">Loading fee records...</p>
                 </div>
-                <div className="p-4 rounded-xl border bg-muted/20">
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Assigned Fee Group</p>
-                  <p className="text-xl font-bold mt-1">Class {student.class} Standard</p>
+              ) : feesError ? (
+                <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-xl flex items-center gap-3 text-destructive">
+                  <AlertCircle className="h-5 w-5" />
+                  <div className="text-xs">
+                    <p className="font-bold">Failed to load fee records</p>
+                    <p className="opacity-90">{feesError?.data?.message || "Verify your connection or server status."}</p>
+                  </div>
                 </div>
-                <div className="p-4 rounded-xl border bg-muted/20">
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Pending Charges</p>
-                  <p className="text-xl font-bold mt-1 text-destructive">
-                    {student.feeStatus === "Pending" ? "Rs. 15,000" : student.feeStatus === "Overdue" ? "Rs. 25,000" : "Rs. 0"}
-                  </p>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl border bg-muted/20">
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Billed</p>
+                      <p className="text-xl font-bold mt-1 text-primary">Rs. {totalBilled.toLocaleString()}</p>
+                    </div>
+                    <div className="p-4 rounded-xl border bg-muted/20">
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Paid</p>
+                      <p className="text-xl font-bold mt-1 text-success">Rs. {totalPaid.toLocaleString()}</p>
+                    </div>
+                    <div className="p-4 rounded-xl border bg-muted/20">
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Due</p>
+                      <p className={`text-xl font-bold mt-1 ${totalDue > 0 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                        Rs. {totalDue.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
 
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Recent Invoices</h3>
-                <div className="rounded-xl border overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-muted text-muted-foreground text-left text-xs uppercase font-bold border-b">
-                        <th className="p-3">Invoice ID</th>
-                        <th className="p-3">Billing Month</th>
-                        <th className="p-3">Amount Due</th>
-                        <th className="p-3">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b hover:bg-muted/10">
-                        <td className="p-3 font-mono">INV-2026-092</td>
-                        <td className="p-3">June 2026</td>
-                        <td className="p-3 font-semibold">Rs. 15,000</td>
-                        <td className="p-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-success/15 text-success">Paid</span>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-muted/10">
-                        <td className="p-3 font-mono">INV-2026-054</td>
-                        <td className="p-3">May 2026</td>
-                        <td className="p-3 font-semibold">Rs. 15,000</td>
-                        <td className="p-3">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-success/15 text-success">Paid</span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold">Monthly Fee Statement</h3>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const nextMonth = availableMonths[0] || "";
+                          setAddForm({
+                            month: nextMonth,
+                            amount: "",
+                            paymentDate: new Date().toISOString().split("T")[0],
+                            paymentMethod: "Cash",
+                            status: "Paid",
+                            remarks: ""
+                          });
+                          setIsAddOpen(true);
+                        }}
+                        disabled={availableMonths.length === 0}
+                        title={availableMonths.length === 0 ? "All months already configured" : ""}
+                        className="gap-1.5 gradient-primary text-primary-foreground border-0 shadow-glow"
+                      >
+                        <Plus className="h-4 w-4" /> Add Month Fee
+                      </Button>
+                    </div>
+                    <div className="rounded-xl border overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-muted text-muted-foreground text-left text-xs uppercase font-bold border-b">
+                            <th className="p-3">Month</th>
+                            <th className="p-3">Status</th>
+                            <th className="p-3">Amount</th>
+                            <th className="p-3">Payment Date</th>
+                            <th className="p-3">Method</th>
+                            <th className="p-3">Remarks</th>
+                            <th className="p-3 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {feeRecords.length === 0 ? (
+                            <tr>
+                              <td colSpan={7} className="p-6 text-center text-muted-foreground text-xs">
+                                No fee statements set up for this student.
+                              </td>
+                            </tr>
+                          ) : (
+                            [...feeRecords]
+                              .sort((a, b) => {
+                                const indexA = MONTHS_ORDER.indexOf(a.month);
+                                const indexB = MONTHS_ORDER.indexOf(b.month);
+                                if (indexA === -1) return 1;
+                                if (indexB === -1) return -1;
+                                return indexA - indexB;
+                              })
+                              .map((fee) => {
+                                return (
+                                  <tr key={fee.id} className="border-b hover:bg-muted/10 transition-colors">
+                                    <td className="p-3 font-semibold">{fee.month}</td>
+                                    <td className="p-3">
+                                      <StatusBadge status={fee.status || "Pending"} />
+                                    </td>
+                                    <td className="p-3 font-medium">Rs. {(fee.amount || 0).toLocaleString()}</td>
+                                    <td className="p-3 text-xs text-muted-foreground">
+                                      {fee.paymentDate || "—"}
+                                    </td>
+                                    <td className="p-3 text-xs text-muted-foreground">
+                                      {fee.paymentMethod || "—"}
+                                    </td>
+                                    <td className="p-3 text-xs max-w-[150px] truncate" title={fee.remarks}>
+                                      {fee.remarks || "—"}
+                                    </td>
+                                    <td className="p-3 text-right">
+                                      <div className="inline-flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-8 w-8 p-0"
+                                          onClick={() => handleOpenEdit(fee)}
+                                          title="Edit details"
+                                        >
+                                          <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-8 w-8 p-0 text-success hover:text-success"
+                                          onClick={() => handleOpenPay(fee)}
+                                          disabled={fee.status?.toLowerCase() === "paid"}
+                                          title="Record Payment"
+                                        >
+                                          <CreditCard className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                          onClick={() => handleDeleteFee(fee.id, fee.month)}
+                                          disabled={isDeletingFee}
+                                          title="Delete statement"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -336,6 +607,259 @@ export default function StudentDetailsPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Fee Details Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-primary" /> Edit {selectedFee ? selectedFee.month : ""} Fee Details
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveEdit} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-amount">Total Fee Amount (Rs.)</Label>
+              <Input
+                id="edit-amount"
+                type="number"
+                value={editForm.amount}
+                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                placeholder="e.g. 5000"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-status">Status</Label>
+              <select
+                id="edit-status"
+                value={editForm.status}
+                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-payment-date">Payment Date</Label>
+              <Input
+                id="edit-payment-date"
+                type="date"
+                value={editForm.paymentDate}
+                onChange={(e) => setEditForm({ ...editForm, paymentDate: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-payment-method">Payment Method</Label>
+              <select
+                id="edit-payment-method"
+                value={editForm.paymentMethod}
+                onChange={(e) => setEditForm({ ...editForm, paymentMethod: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="EasyPaisa">EasyPaisa</option>
+                <option value="JazzCash">JazzCash</option>
+                <option value="Card">Card</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-remarks">Remarks</Label>
+              <Textarea
+                id="edit-remarks"
+                value={editForm.remarks}
+                onChange={(e) => setEditForm({ ...editForm, remarks: e.target.value })}
+                placeholder="Remarks, e.g. Paid in cash"
+                rows={3}
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0 mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} disabled={isUpdatingFee}>
+                Cancel
+              </Button>
+              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isUpdatingFee}>
+                {isUpdatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Record Payment Dialog */}
+      <Dialog open={isPayOpen} onOpenChange={setIsPayOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-success" /> Record {selectedFee ? selectedFee.month : ""} Fee Payment
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSavePay} className="space-y-4 py-2">
+            <div className="bg-muted/40 p-3 rounded-lg text-xs space-y-1">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Month:</span>
+                <span className="font-semibold capitalize">{selectedFee?.month}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Original Fee:</span>
+                <span className="font-semibold">Rs. {(selectedFee?.amount || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-destructive font-bold border-t pt-1 mt-1">
+                <span>Remaining Due:</span>
+                <span>Rs. {(selectedFee?.amount || 0).toLocaleString()}</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pay-date">Payment Date</Label>
+              <Input
+                id="pay-date"
+                type="date"
+                value={payForm.paymentDate}
+                onChange={(e) => setPayForm({ ...payForm, paymentDate: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pay-method">Payment Method</Label>
+              <select
+                id="pay-method"
+                value={payForm.paymentMethod}
+                onChange={(e) => setPayForm({ ...payForm, paymentMethod: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="EasyPaisa">EasyPaisa</option>
+                <option value="JazzCash">JazzCash</option>
+                <option value="Card">Card</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pay-remarks">Remarks / Description</Label>
+              <Textarea
+                id="pay-remarks"
+                value={payForm.remarks}
+                onChange={(e) => setPayForm({ ...payForm, remarks: e.target.value })}
+                placeholder="Remarks, e.g. Paid in cash"
+                rows={3}
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0 mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsPayOpen(false)} disabled={isUpdatingFee}>
+                Cancel
+              </Button>
+              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isUpdatingFee}>
+                {isUpdatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Record Payment
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Month Fee Dialog */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Plus className="h-5 w-5 text-primary" /> Add Month Fee Configuration
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveAdd} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="add-month">Select Month</Label>
+              <select
+                id="add-month"
+                value={addForm.month}
+                onChange={(e) => setAddForm({ ...addForm, month: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="" disabled>Select a month...</option>
+                {availableMonths.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-amount">Total Fee Amount (Rs.)</Label>
+              <Input
+                id="add-amount"
+                type="number"
+                value={addForm.amount}
+                onChange={(e) => setAddForm({ ...addForm, amount: e.target.value })}
+                placeholder="e.g. 5000"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-status">Status</Label>
+              <select
+                id="add-status"
+                value={addForm.status}
+                onChange={(e) => setAddForm({ ...addForm, status: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-payment-date">Payment Date</Label>
+              <Input
+                id="add-payment-date"
+                type="date"
+                value={addForm.paymentDate}
+                onChange={(e) => setAddForm({ ...addForm, paymentDate: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-payment-method">Payment Method</Label>
+              <select
+                id="add-payment-method"
+                value={addForm.paymentMethod}
+                onChange={(e) => setAddForm({ ...addForm, paymentMethod: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="EasyPaisa">EasyPaisa</option>
+                <option value="JazzCash">JazzCash</option>
+                <option value="Card">Card</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-remarks">Remarks</Label>
+              <Textarea
+                id="add-remarks"
+                value={addForm.remarks}
+                onChange={(e) => setAddForm({ ...addForm, remarks: e.target.value })}
+                placeholder="Remarks, e.g. Monthly tuition fee"
+                rows={3}
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0 mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} disabled={isCreatingFee}>
+                Cancel
+              </Button>
+              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isCreatingFee}>
+                {isCreatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Add Configuration
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
