@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Formik } from "formik";
+import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { PrimaryButton, CancelButton } from "@/components/common/buttons";
 import { cn } from "@/utils/utils";
 import { toast } from "sonner";
+import { useCreateStudentMutation } from "@/services/private/studentService";
 import {
   User,
   BookOpen,
@@ -47,6 +49,8 @@ const steps = [
 function AdmissionPage() {
   const [step, setStep] = useState(1);
   const [preview, setPreview] = useState(false);
+  const navigate = useNavigate();
+  const [createStudent, { isLoading }] = useCreateStudentMutation();
   const progress = (step / steps.length) * 100;
   const next = () => setStep((s) => Math.min(s + 1, steps.length));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
@@ -55,13 +59,25 @@ function AdmissionPage() {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values, { resetForm }) => {
-        toast.success("Admission submitted successfully!", {
-          description: `${values.fullName || "Student"} has been enrolled.`,
-        });
-        setStep(1);
-        setPreview(false);
-        resetForm();
+      onSubmit={async (values, { resetForm }) => {
+        try {
+          const formData = new FormData();
+          Object.entries(values).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+              formData.append(key, value);
+            }
+          });
+          await createStudent(formData).unwrap();
+          toast.success("Admission submitted successfully!", {
+            description: `${values.fullName || "Student"} has been enrolled.`,
+          });
+          setStep(1);
+          setPreview(false);
+          resetForm();
+          navigate("/students");
+        } catch (err) {
+          toast.error(err?.data?.message || "Failed to submit admission.");
+        }
       }}
     >
       {(formikProps) => {
@@ -165,7 +181,7 @@ function AdmissionPage() {
                 </div>
               </Card>
             ) : (
-              <ReviewSubmit setPreview={setPreview} {...formikProps} />
+              <ReviewSubmit setPreview={setPreview} isLoading={isLoading} {...formikProps} />
             )}
           </div>
         );

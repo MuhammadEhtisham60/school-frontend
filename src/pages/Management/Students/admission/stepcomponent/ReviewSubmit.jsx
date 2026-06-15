@@ -4,7 +4,7 @@ import { CancelButton, SubmitButton } from "@/components/common/buttons";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 
-export function ReviewSubmit({ setPreview }) {
+export function ReviewSubmit({ setPreview, isLoading }) {
   const { values, submitForm } = useFormikContext();
 
   return (
@@ -16,7 +16,7 @@ export function ReviewSubmit({ setPreview }) {
             Double-check the details before final submission.
           </p>
         </div>
-        <CancelButton onClick={() => setPreview(false)}>
+        <CancelButton onClick={() => setPreview(false)} disabled={isLoading}>
           Edit
         </CancelButton>
       </div>
@@ -41,13 +41,15 @@ export function ReviewSubmit({ setPreview }) {
           })}
       </div>
       <div className="flex justify-end gap-2 mt-8">
-        <CancelButton onClick={() => setPreview(false)}>
+        <CancelButton onClick={() => setPreview(false)} disabled={isLoading}>
           Back
         </CancelButton>
         <SubmitButton
           onClick={submitForm}
           variant="contained"
           color="success"
+          loading={isLoading}
+          disabled={isLoading}
           startIcon={<CheckCircle2 className="h-4 w-4" />}
         >
           Submit Admission
