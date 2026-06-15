@@ -53,4 +53,3 @@ export const {
   useResendOtpMutation,
   useResetPasswordMutation,
 } = authApi;
-

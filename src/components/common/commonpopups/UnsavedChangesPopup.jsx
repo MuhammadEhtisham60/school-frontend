@@ -26,22 +26,14 @@ export const UnsavedChangesPopup = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">{title}</h3>
 
         {/* Message */}
-        <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">
-          {message}
-        </p>
+        <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">{message}</p>
 
         {/* Action buttons */}
         <div className="flex flex-col-reverse sm:flex-row gap-3 w-full mt-2">
-          <CancelButton
-            onClick={onStay}
-            fullWidth
-            className="sm:w-1/2 font-semibold"
-          >
+          <CancelButton onClick={onStay} fullWidth className="sm:w-1/2 font-semibold">
             Stay
           </CancelButton>
           <PrimaryButton

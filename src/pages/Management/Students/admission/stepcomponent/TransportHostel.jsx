@@ -19,12 +19,7 @@ export function TransportHostel() {
           label="Bus Route"
           placeholder="Select route"
           full
-          options={[
-            "Route A — North",
-            "Route B — South",
-            "Route C — East",
-            "Route D — West",
-          ]}
+          options={["Route A — North", "Route B — South", "Route C — East", "Route D — West"]}
         />
       )}
       <FormikCheckBox

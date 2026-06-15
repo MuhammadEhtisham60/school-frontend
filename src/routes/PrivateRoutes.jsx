@@ -1,9 +1,27 @@
 import React from "react";
 import { DashboardPage } from "@/pages/Management/Dashboard";
-import { AdmissionPage, StudentsPage, AttendancePage, StudentDetailsPage } from "@/pages/Management/Students";
-import { TeachersPage, AccountantPage, AdminsPage, UsersPage, RoleUsersPage } from "@/pages/Management/Employees";
+import {
+  AdmissionPage,
+  StudentsPage,
+  AttendancePage,
+  StudentDetailsPage,
+} from "@/pages/Management/Students";
+import {
+  TeachersPage,
+  AccountantPage,
+  AdminsPage,
+  UsersPage,
+  RoleUsersPage,
+} from "@/pages/Management/Employees";
 import { ClassRoutinePage, SubjectsPage, ExamPage, ResultPage } from "@/pages/Management/Academics";
-import { FileManagerPage, LibraryPage, PaperCollectionPage, EventCalendarPage, NoticePage, ReportsPage } from "@/pages/Management/Resources";
+import {
+  FileManagerPage,
+  LibraryPage,
+  PaperCollectionPage,
+  EventCalendarPage,
+  NoticePage,
+  ReportsPage,
+} from "@/pages/Management/Resources";
 import { FeesPage } from "@/pages/Management/Finance";
 import { SettingsPage } from "@/pages/Management/Settings";
 import RouteGuard from "./RouteGuard";
@@ -14,98 +32,98 @@ export const privateRoutes = [
     children: [
       {
         path: "/backoffice",
-        element: <DashboardPage />
+        element: <DashboardPage />,
       },
       {
         path: "/admission",
-        element: <AdmissionPage />
+        element: <AdmissionPage />,
       },
       {
         path: "/admission/:id",
-        element: <AdmissionPage />
+        element: <AdmissionPage />,
       },
       {
         path: "/students",
-        element: <StudentsPage />
+        element: <StudentsPage />,
       },
       {
         path: "/students/details/:id",
-        element: <StudentDetailsPage />
+        element: <StudentDetailsPage />,
       },
       {
         path: "/teachers",
-        element: <TeachersPage />
+        element: <TeachersPage />,
       },
       {
         path: "/admins",
-        element: <AdminsPage />
+        element: <AdminsPage />,
       },
       {
         path: "/users",
-        element: <UsersPage />
+        element: <UsersPage />,
       },
       {
         path: "/role-users",
-        element: <RoleUsersPage />
+        element: <RoleUsersPage />,
       },
       {
         path: "/subjects",
-        element: <SubjectsPage />
+        element: <SubjectsPage />,
       },
       {
         path: "/class-routine",
-        element: <ClassRoutinePage />
+        element: <ClassRoutinePage />,
       },
       {
         path: "/exam",
-        element: <ExamPage />
+        element: <ExamPage />,
       },
       {
         path: "/result",
-        element: <ResultPage />
+        element: <ResultPage />,
       },
       {
         path: "/library",
-        element: <LibraryPage />
+        element: <LibraryPage />,
       },
       {
         path: "/attendance",
-        element: <AttendancePage />
+        element: <AttendancePage />,
       },
       {
         path: "/fees",
-        element: <FeesPage />
+        element: <FeesPage />,
       },
       {
         path: "/accountant",
-        element: <AccountantPage />
+        element: <AccountantPage />,
       },
       {
         path: "/notice",
-        element: <NoticePage />
+        element: <NoticePage />,
       },
       {
         path: "/event-calendar",
-        element: <EventCalendarPage />
+        element: <EventCalendarPage />,
       },
       {
         path: "/reports",
-        element: <ReportsPage />
+        element: <ReportsPage />,
       },
       {
         path: "/file-manager",
-        element: <FileManagerPage />
+        element: <FileManagerPage />,
       },
       {
         path: "/paper-collection",
-        element: <PaperCollectionPage />
+        element: <PaperCollectionPage />,
       },
       {
         path: "/settings",
-        element: <SettingsPage />
-      }
-    ]
-  }
+        element: <SettingsPage />,
+      },
+    ],
+  },
 ];
 
 export default privateRoutes;

@@ -42,10 +42,7 @@ export function FormikSearchSelect({
   return (
     <div className={cn("space-y-2 flex flex-col", full && "md:col-span-2")}>
       {label && (
-        <Label
-          htmlFor={name}
-          className={cn("text-sm font-medium", isError && "text-destructive")}
-        >
+        <Label htmlFor={name} className={cn("text-sm font-medium", isError && "text-destructive")}>
           {label} {required && <span className="text-destructive">*</span>}
         </Label>
       )}
@@ -60,7 +57,7 @@ export function FormikSearchSelect({
             className={cn(
               "w-full justify-between text-left font-normal h-9 border-input bg-transparent px-3 py-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
               !field.value && "text-muted-foreground",
-              isError && "border-destructive focus:ring-destructive"
+              isError && "border-destructive focus:ring-destructive",
             )}
             {...props}
           >
@@ -88,10 +85,7 @@ export function FormikSearchSelect({
                       }}
                     >
                       <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          isSelected ? "opacity-100" : "opacity-0"
-                        )}
+                        className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
                       />
                       {lbl}
                     </CommandItem>
@@ -105,9 +99,7 @@ export function FormikSearchSelect({
       {helperText && !isError && (
         <p className="text-[0.8rem] text-muted-foreground">{helperText}</p>
       )}
-      {isError && (
-        <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>
-      )}
+      {isError && <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>}
     </div>
   );
 }

@@ -1,20 +1,29 @@
 import React from "react";
 import Page from "@/pages/index";
-import { SiteLayout, SiteIndex, SiteAbout, SiteAcademics, SiteAdmissions, SiteCampus, SiteContact, SiteManage } from "@/pages/Site";
+import {
+  SiteLayout,
+  SiteIndex,
+  SiteAbout,
+  SiteAcademics,
+  SiteAdmissions,
+  SiteCampus,
+  SiteContact,
+  SiteManage,
+} from "@/pages/Site";
 import UnauthorizedPage from "@/pages/auth/unauthorized";
 
 export const publicRoutes = [
   {
     path: "/",
-    element: <Page />
+    element: <Page />,
   },
   {
     path: "/unauthorized",
-    element: <UnauthorizedPage />
+    element: <UnauthorizedPage />,
   },
   {
     path: "/site-manage",
-    element: <SiteManage />
+    element: <SiteManage />,
   },
   {
     path: "/site",
@@ -22,30 +31,30 @@ export const publicRoutes = [
     children: [
       {
         index: true,
-        element: <SiteIndex />
+        element: <SiteIndex />,
       },
       {
         path: "about",
-        element: <SiteAbout />
+        element: <SiteAbout />,
       },
       {
         path: "academics",
-        element: <SiteAcademics />
+        element: <SiteAcademics />,
       },
       {
         path: "admissions",
-        element: <SiteAdmissions />
+        element: <SiteAdmissions />,
       },
       {
         path: "campus",
-        element: <SiteCampus />
+        element: <SiteCampus />,
       },
       {
         path: "contact",
-        element: <SiteContact />
-      }
-    ]
-  }
+        element: <SiteContact />,
+      },
+    ],
+  },
 ];
 
 export default publicRoutes;

@@ -32,10 +32,7 @@ export function FormikFile({
   return (
     <div className={cn("space-y-2", full && "md:col-span-2")}>
       {label && !compact && (
-        <Label
-          htmlFor={name}
-          className={cn("text-sm font-medium", isError && "text-destructive")}
-        >
+        <Label htmlFor={name} className={cn("text-sm font-medium", isError && "text-destructive")}>
           {label} {required && <span className="text-destructive">*</span>}
         </Label>
       )}
@@ -45,13 +42,13 @@ export function FormikFile({
           "flex items-center gap-3 border-2 border-dashed rounded-xl cursor-pointer hover:bg-muted/40 transition-smooth",
           compact ? "p-4" : "p-6 justify-center",
           isError && "border-destructive focus-within:ring-destructive",
-          disabled && "opacity-50 cursor-not-allowed"
+          disabled && "opacity-50 cursor-not-allowed",
         )}
       >
         <div
           className={cn(
             "rounded-lg gradient-primary flex items-center justify-center text-white",
-            compact ? "h-10 w-10 shrink-0" : "h-10 w-10 rounded-full shrink-0"
+            compact ? "h-10 w-10 shrink-0" : "h-10 w-10 rounded-full shrink-0",
           )}
         >
           {file ? <File className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
@@ -84,9 +81,7 @@ export function FormikFile({
       {helperText && !isError && (
         <p className="text-[0.8rem] text-muted-foreground">{helperText}</p>
       )}
-      {isError && (
-        <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>
-      )}
+      {isError && <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>}
     </div>
   );
 }

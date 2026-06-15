@@ -47,7 +47,7 @@ export const theme = {
       700: "oklch(0.25 0.04 265)",
       800: "oklch(0.18 0.04 265)",
       900: "oklch(0.1 0.04 265)",
-    }
+    },
   },
   typography: {
     fontFamily: '"Inter", "Outfit", sans-serif',
@@ -62,7 +62,12 @@ export const theme = {
     body1: { fontSize: "1rem", fontWeight: 400, lineHeight: 1.6 },
     body2: { fontSize: "0.875rem", fontWeight: 400, lineHeight: 1.57 },
     caption: { fontSize: "0.75rem", fontWeight: 400, lineHeight: 1.66 },
-    overline: { fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" },
+    overline: {
+      fontSize: "0.75rem",
+      fontWeight: 600,
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+    },
     button: { fontSize: "0.875rem", fontWeight: 600, textTransform: "none" },
   },
   shape: {
@@ -70,11 +75,11 @@ export const theme = {
       xs: "calc(0.875rem - 6px)", // 8px
       sm: "calc(0.875rem - 4px)", // 10px
       md: "calc(0.875rem - 2px)", // 12px
-      lg: "0.875rem",             // 14px
+      lg: "0.875rem", // 14px
       xl: "calc(0.875rem + 4px)", // 18px
       xxl: "calc(0.875rem + 8px)", // 22px
       xxxl: "calc(0.875rem + 12px)", // 26px
-    }
+    },
   },
   shadows: {
     sm: "0 1px 2px 0 oklch(0.2 0.05 280 / 0.05)",
@@ -92,7 +97,7 @@ export const theme = {
   },
   components: {
     button: {
-      getButtonStyles
-    }
-  }
+      getButtonStyles,
+    },
+  },
 };

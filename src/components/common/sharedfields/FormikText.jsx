@@ -22,10 +22,7 @@ export function FormikText({
   return (
     <div className={cn("space-y-2", full && "md:col-span-2")}>
       {label && (
-        <Label
-          htmlFor={name}
-          className={cn("text-sm font-medium", isError && "text-destructive")}
-        >
+        <Label htmlFor={name} className={cn("text-sm font-medium", isError && "text-destructive")}>
           {label} {required && <span className="text-destructive">*</span>}
         </Label>
       )}
@@ -43,9 +40,7 @@ export function FormikText({
       {helperText && !isError && (
         <p className="text-[0.8rem] text-muted-foreground">{helperText}</p>
       )}
-      {isError && (
-        <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>
-      )}
+      {isError && <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>}
     </div>
   );
 }

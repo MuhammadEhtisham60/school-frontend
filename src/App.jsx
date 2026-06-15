@@ -1,19 +1,19 @@
-import { useMemo } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { SnackbarProvider } from 'notistack';
-import { useEffect, useState } from 'react';
+import { useMemo } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
+import { useEffect, useState } from "react";
 
-import routes from '@/routes';
-import ThemeCustomization from '@/themes';
-import Locales from '@/components/Locales';
-import FullScreenLoader from '@/components/FullScreenLoader';
-import AuthInitializer from '@/components/AuthInitializer';
+import routes from "@/routes";
+import ThemeCustomization from "@/themes";
+import Locales from "@/components/Locales";
+import FullScreenLoader from "@/components/FullScreenLoader";
+import AuthInitializer from "@/components/AuthInitializer";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const pathname = window.location.pathname;
-  const isGptPage = pathname.startsWith('/assistant');
-  const isWebsiteBuilder = pathname.startsWith('/website-builder');
+  const isGptPage = pathname.startsWith("/assistant");
+  const isWebsiteBuilder = pathname.startsWith("/website-builder");
 
   // Create router using the React Router configuration
   const router = useMemo(() => {
@@ -42,7 +42,7 @@ export default function App() {
       <AuthInitializer>
         <SnackbarProvider
           maxSnack={3}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           autoHideDuration={3000}
           style={{ zIndex: 4500 }}
         >
@@ -56,4 +56,3 @@ export default function App() {
     </>
   );
 }
-

@@ -50,7 +50,7 @@ export const apiHandleToaster = {
       apiHandleToaster.error(err, defaultErrorMessage);
       throw err;
     }
-  }
+  },
 };
 
 export default apiHandleToaster;

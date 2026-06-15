@@ -58,7 +58,9 @@ function AdmissionPage() {
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
 
-  const { data: studentData, isLoading: isStudentLoading } = useGetStudentQuery(id, { skip: !isEditMode });
+  const { data: studentData, isLoading: isStudentLoading } = useGetStudentQuery(id, {
+    skip: !isEditMode,
+  });
   const student = studentData?.student;
 
   const [createStudent, { isLoading: isCreating }] = useCreateStudentMutation();
@@ -210,7 +212,11 @@ function AdmissionPage() {
                           active ? "bg-white/20" : done ? "bg-success/20" : "bg-muted",
                         )}
                       >
-                        {done ? <CheckCircle2 className="h-5 w-5" /> : <s.icon className="h-4 w-4" />}
+                        {done ? (
+                          <CheckCircle2 className="h-5 w-5" />
+                        ) : (
+                          <s.icon className="h-4 w-4" />
+                        )}
                       </div>
                       <span className="text-xs font-semibold">{s.title}</span>
                     </button>
@@ -239,10 +245,7 @@ function AdmissionPage() {
                     Back
                   </CancelButton>
                   {step < steps.length ? (
-                    <PrimaryButton
-                      onClick={next}
-                      endIcon={<ChevronRight className="h-4 w-4" />}
-                    >
+                    <PrimaryButton onClick={next} endIcon={<ChevronRight className="h-4 w-4" />}>
                       Next Step
                     </PrimaryButton>
                   ) : (

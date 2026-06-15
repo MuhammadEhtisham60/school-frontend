@@ -20,6 +20,7 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 ## 2. API Endpoints Reference
 
 ### 1. Create Student (Admission)
+
 - **Method**: `POST`
 - **URL**: `http://localhost:5000/api/students/admission` (or `/api/students/enroll`)
 - **Headers**:
@@ -31,29 +32,29 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 
 #### Body Parameters (form-data):
 
-| Key | Type | Value (Example) | Description |
-| :--- | :--- | :--- | :--- |
-| `fullName` | Text | Ali Khan | **Required**. Student's full name. |
-| `fatherName` | Text | Ahmed Khan | **Required**. Father's name. |
-| `dob` | Text | 2015-05-14 | **Required** (Format: `YYYY-MM-DD`). |
-| `gender` | Text | Male | **Required** (Options: `Male`, `Female`, `Other`). |
-| `class` | Text | 5 | **Required** (Target class). |
-| `section` | Text | A | **Required** (Section assignment). |
-| `mobile` | Text | 0300-1234567 | **Required** (Primary contact). |
-| `rollNo` | Text | 2026-001 | *Optional*. If left empty, backend auto-generates it. |
-| `cnic` | Text | 12345-1234567-1 | *Optional* (B-Form/CNIC number). |
-| `prevSchool` | Text | Beaconhouse | *Optional*. |
-| `lastResult` | Text | 85 | *Optional* (Previous exam percentage). |
-| `admissionDate`| Text | 2026-06-14 | *Optional* (Defaults to today's date). |
-| `transport` | Text | false | *Optional* (Defaults to `false`). |
-| `hostel` | Text | false | *Optional* (Defaults to `false`). |
-| `photo` | **File** | *[Select Image File]* | *Optional* (Profile photo). |
-| `studentPhoto` | **File** | *[Select Image File]* | *Optional* (Documents photo). |
-| `bFormCopy` | **File** | *[Select PDF/Image]* | *Optional* (CNIC/B-Form copy). |
-| `prevResultCard`| **File** | *[Select PDF/Image]* | *Optional* (Previous result card). |
-| `guardianCnic` | **File** | *[Select PDF/Image]* | *Optional* (Guardian CNIC copy). |
+| Key              | Type     | Value (Example)       | Description                                           |
+| :--------------- | :------- | :-------------------- | :---------------------------------------------------- |
+| `fullName`       | Text     | Ali Khan              | **Required**. Student's full name.                    |
+| `fatherName`     | Text     | Ahmed Khan            | **Required**. Father's name.                          |
+| `dob`            | Text     | 2015-05-14            | **Required** (Format: `YYYY-MM-DD`).                  |
+| `gender`         | Text     | Male                  | **Required** (Options: `Male`, `Female`, `Other`).    |
+| `class`          | Text     | 5                     | **Required** (Target class).                          |
+| `section`        | Text     | A                     | **Required** (Section assignment).                    |
+| `mobile`         | Text     | 0300-1234567          | **Required** (Primary contact).                       |
+| `rollNo`         | Text     | 2026-001              | _Optional_. If left empty, backend auto-generates it. |
+| `cnic`           | Text     | 12345-1234567-1       | _Optional_ (B-Form/CNIC number).                      |
+| `prevSchool`     | Text     | Beaconhouse           | _Optional_.                                           |
+| `lastResult`     | Text     | 85                    | _Optional_ (Previous exam percentage).                |
+| `admissionDate`  | Text     | 2026-06-14            | _Optional_ (Defaults to today's date).                |
+| `transport`      | Text     | false                 | _Optional_ (Defaults to `false`).                     |
+| `hostel`         | Text     | false                 | _Optional_ (Defaults to `false`).                     |
+| `photo`          | **File** | _[Select Image File]_ | _Optional_ (Profile photo).                           |
+| `studentPhoto`   | **File** | _[Select Image File]_ | _Optional_ (Documents photo).                         |
+| `bFormCopy`      | **File** | _[Select PDF/Image]_  | _Optional_ (CNIC/B-Form copy).                        |
+| `prevResultCard` | **File** | _[Select PDF/Image]_  | _Optional_ (Previous result card).                    |
+| `guardianCnic`   | **File** | _[Select PDF/Image]_  | _Optional_ (Guardian CNIC copy).                      |
 
-*Note: In Postman, to upload a file, change the key type from **Text** to **File** by hovering over the key field and selecting the dropdown.*
+_Note: In Postman, to upload a file, change the key type from **Text** to **File** by hovering over the key field and selecting the dropdown._
 
 - **Expected Response (201 Created)**:
   ```json
@@ -79,6 +80,7 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 ---
 
 ### 2. Get Students List
+
 - **Method**: `GET`
 - **URL**: `http://localhost:5000/api/students`
 - **Headers**:
@@ -112,6 +114,7 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 ---
 
 ### 3. Get Student Details
+
 - **Method**: `GET`
 - **URL**: `http://localhost:5000/api/students/:id`
 - **Headers**:
@@ -146,6 +149,7 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 ---
 
 ### 4. Update Student Details
+
 - **Method**: `PUT`
 - **URL**: `http://localhost:5000/api/students/:id`
 - **Headers**:
@@ -173,6 +177,7 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 ---
 
 ### 5. Delete Student
+
 - **Method**: `DELETE`
 - **URL**: `http://localhost:5000/api/students/:id`
 - **Headers**:

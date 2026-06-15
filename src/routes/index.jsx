@@ -21,12 +21,8 @@ export function RootLayout() {
 export const routes = [
   {
     element: <RootLayout />,
-    children: [
-      ...publicRoutes,
-      ...authRoutes,
-      ...privateRoutes
-    ]
-  }
+    children: [...publicRoutes, ...authRoutes, ...privateRoutes],
+  },
 ];
 
 export default routes;

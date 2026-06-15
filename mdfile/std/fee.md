@@ -1,113 +1,174 @@
-# Postman Testing Guide - Student CRUD APIs
+# Postman Testing & Frontend Integration Guide - Student Fee Management
 
-This guide explains how to test the Student Admission and CRUD APIs using Postman.
+This guide explains how to test the Student Fee Management APIs using Postman and integrate them with the React frontend using the existing **Redux Toolkit Query (RTK Query)** architecture.
 
-## 1. Setup & Environment
+---
+
+## 1. Setup & Environment (Postman)
 
 1. **Start the server**: Ensure the backend is running.
    ```bash
    npm run dev
    ```
-2. **Base URL**: All Student endpoints are prefixed with:
-   `http://localhost:5000/api/students`
-3. **Authentication**: All routes are protected. You MUST provide a Bearer JWT Token in the headers:
+2. **Base URL**: All Fee endpoints are prefixed with:
+   `http://localhost:5000/api/fees`
+3. **Authentication**: All routes are protected by JWT auth.
    - Go to the **Authorization** tab in Postman.
    - Select **Type**: **Bearer Token**.
-   - Paste the JWT token (which you can get by logging in or registering a user via the Auth APIs).
+   - Paste the JWT token (retrieve it by logging in or registering a user via the Auth APIs).
 
 ---
 
-## 2. API Endpoints Reference
+## 2. API Endpoints Reference (Postman)
 
-### 1. Create Student (Admission)
+### 1. Create Fee Record
+
+Add a monthly fee against a student.
+
 - **Method**: `POST`
-- **URL**: `http://localhost:5000/api/students/admission` (or `/api/students/enroll`)
+- **URL**: `http://localhost:5000/api/fees`
 - **Headers**:
   - `Authorization: Bearer <token>`
-- **Postman Setup**:
-  1. Set method to **POST** and enter the URL.
-  2. Go to the **Body** tab, select **form-data** (do NOT use raw JSON, as this endpoint accepts file uploads).
-  3. Enter the following key-value pairs:
+  - `Content-Type: application/json`
+- **Body (raw JSON)**:
+  ```json
+  {
+    "studentId": "std_135428019",
+    "month": "January",
+    "amount": 5000,
+    "paymentDate": "2026-06-15",
+    "paymentMethod": "Cash",
+    "status": "Paid",
+    "remarks": "Monthly Tuition Fee"
+  }
+  ```
+- **Validation Rules**:
+  - `studentId` (string, required): Must exist in the `students` table.
+  - `month` (string, required): Must be one of the valid month names (e.g. `January`, `February`, etc.).
+  - `amount` (number, required): Must be greater than 0.
+  - `paymentDate` (string, required): Must be in `YYYY-MM-DD` format.
+  - `paymentMethod` (string, required): Any non-empty string.
+  - `status` (string, optional): Defaults to `Paid` if omitted.
+  - **Skip-Month Restriction**: You cannot skip months when adding fees. For instance, if the latest recorded fee is for `February`, attempting to add a fee for `July` will be rejected with a `400 Bad Request` listing all intermediate missing months.
+- **Expected Responses**:
+  - **201 Created (Success)**:
+    ```json
+    {
+      "success": true,
+      "message": "Fee added successfully.",
+      "data": { ... }
+    }
+    ```
+  - **400 Bad Request (Month Skip Restriction)**:
+    ```json
+    {
+      "success": false,
+      "message": "Cannot add fee for July. Please record fees for the preceding month(s) first: March, April, May, June."
+    }
+    ```
+  - **400 Bad Request (Duplicate)**:
+    ```json
+    {
+      "success": false,
+      "message": "Fee for this month already exists."
+    }
+    ```
+  - **404 Not Found (Student Missing)**:
+    ```json
+    {
+      "success": false,
+      "message": "Student not found."
+    }
+    ```
 
-#### Body Parameters (form-data):
+---
 
-| Key | Type | Value (Example) | Description |
-| :--- | :--- | :--- | :--- |
-| `fullName` | Text | Ali Khan | **Required**. Student's full name. |
-| `fatherName` | Text | Ahmed Khan | **Required**. Father's name. |
-| `dob` | Text | 2015-05-14 | **Required** (Format: `YYYY-MM-DD`). |
-| `gender` | Text | Male | **Required** (Options: `Male`, `Female`, `Other`). |
-| `class` | Text | 5 | **Required** (Target class). |
-| `section` | Text | A | **Required** (Section assignment). |
-| `mobile` | Text | 0300-1234567 | **Required** (Primary contact). |
-| `rollNo` | Text | 2026-001 | *Optional*. If left empty, backend auto-generates it. |
-| `cnic` | Text | 12345-1234567-1 | *Optional* (B-Form/CNIC number). |
-| `prevSchool` | Text | Beaconhouse | *Optional*. |
-| `lastResult` | Text | 85 | *Optional* (Previous exam percentage). |
-| `admissionDate`| Text | 2026-06-14 | *Optional* (Defaults to today's date). |
-| `transport` | Text | false | *Optional* (Defaults to `false`). |
-| `hostel` | Text | false | *Optional* (Defaults to `false`). |
-| `is_active` | Text | true | *Optional*. Status flag (`true`: active, `false`: inactive). Defaults to `true`. |
-| `photo` | **File** | *[Select Image File]* | *Optional* (Profile photo). |
-| `studentPhoto` | **File** | *[Select Image File]* | *Optional* (Documents photo). |
-| `bFormCopy` | **File** | *[Select PDF/Image]* | *Optional* (CNIC/B-Form copy). |
-| `prevResultCard`| **File** | *[Select PDF/Image]* | *Optional* (Previous result card). |
-| `guardianCnic` | **File** | *[Select PDF/Image]* | *Optional* (Guardian CNIC copy). |
+### 2. Get All Fees
 
-*Note: In Postman, to upload a file, change the key type from **Text** to **File** by hovering over the key field and selecting the dropdown.*
+Get a list of all monthly fee records.
 
-- **Expected Response (201 Created)**:
+- **Method**: `GET`
+- **URL**: `http://localhost:5000/api/fees`
+- **Headers**:
+  - `Authorization: Bearer <token>`
+- **Query Parameters (Params Tab - Optional)**:
+  - `page` (number, optional): Page index (default: `1`).
+  - `limit` (number, optional): Records per page (default: `10`).
+  - `search` (string, optional): Search by student's name.
+  - `month` (string, optional): Filter by month (e.g., `January`).
+  - `status` (string, optional): Filter by payment status (e.g., `Paid`, `Pending`).
+- **Expected Response (200 OK)**:
   ```json
   {
     "success": true,
-    "message": "Student admitted successfully",
-    "data": {
-      "id": "std_963473456",
-      "fullName": "Ali Khan",
-      "fatherName": "Ahmed Khan",
-      "rollNo": "2026-001",
-      "class": "5",
-      "section": "A",
-      "admissionDate": "2026-06-14",
-      "photo": "/uploads/photo-1781423600412-918445536.png",
-      "studentPhoto": "/uploads/studentPhoto-1781423600413-931429342.png",
-      "createdAt": "2026-06-14T12:00:00.000Z",
-      "updatedAt": "2026-06-14T12:00:00.000Z"
+    "message": "Fees list retrieved successfully.",
+    "data": [
+      {
+        "id": 1,
+        "studentId": {
+          "id": "std_135428019",
+          "name": "Ali Khan",
+          "admissionNo": "std_135428019",
+          "class": "Grade 5",
+          "section": "Green",
+          "rollNumber": "2026-268"
+        },
+        "month": "January",
+        "amount": 5000,
+        "paymentDate": "2026-06-15",
+        "paymentMethod": "Cash",
+        "status": "Paid",
+        "remarks": "Monthly Tuition Fee",
+        "createdBy": 1,
+        "createdAt": "2026-06-15T20:30:46.000Z",
+        "updatedAt": "2026-06-15T20:30:46.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "page": 1,
+      "limit": 10,
+      "pages": 1
     }
   }
   ```
 
 ---
 
-### 2. Get Students List
+### 3. Get Student Fee Records
+
+Get all monthly fee records of a specific student.
+
 - **Method**: `GET`
-- **URL**: `http://localhost:5000/api/students`
+- **URL**: `http://localhost:5000/api/fees/student/:studentId`
 - **Headers**:
   - `Authorization: Bearer <token>`
-- **Query Parameters (Params tab in Postman - Optional)**:
-  - `search` (Search by student name, roll number, or ID)
-  - `class` (Filter by class)
-  - `section` (Filter by section)
-  - `is_active` or `isActive` (Filter by active status: `true` or `false`)
-  - `limit` (Pagination limit, default: 100)
-  - `offset` (Pagination offset, default: 0)
-
+- **Postman Setup**: Replace `:studentId` with the student ID (e.g., `std_135428019`).
 - **Expected Response (200 OK)**:
   ```json
   {
     "success": true,
-    "message": "Students list retrieved successfully",
-    "students": [
+    "message": "Student fees retrieved successfully.",
+    "data": [
       {
-        "id": "std_963473456",
-        "fullName": "Ali Khan",
-        "fatherName": "Ahmed Khan",
-        "rollNo": "2026-001",
-        "class": "5",
-        "section": "A",
-        "mobile": "0300-1234567",
-        "isActive": true,
-        "is_active": true
+        "id": 1,
+        "studentId": {
+          "id": "std_135428019",
+          "name": "Ali Khan",
+          "admissionNo": "std_135428019",
+          "class": "Grade 5",
+          "section": "Green",
+          "rollNumber": "2026-268"
+        },
+        "month": "January",
+        "amount": 5000,
+        "paymentDate": "2026-06-15",
+        "paymentMethod": "Cash",
+        "status": "Paid",
+        "remarks": "Monthly Tuition Fee",
+        "createdBy": 1,
+        "createdAt": "2026-06-15T20:30:46.000Z",
+        "updatedAt": "2026-06-15T20:30:46.000Z"
       }
     ]
   }
@@ -115,203 +176,220 @@ This guide explains how to test the Student Admission and CRUD APIs using Postma
 
 ---
 
-### 3. Get Student Details
-- **Method**: `GET`
-- **URL**: `http://localhost:5000/api/students/:id`
-- **Headers**:
-  - `Authorization: Bearer <token>`
-- **Postman Setup**: Replace `:id` in the URL with the actual student ID (e.g. `std_963473456`).
+### 4. Update Fee Record
 
-- **Expected Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Student details retrieved successfully",
-    "student": {
-      "id": "std_963473456",
-      "fullName": "Ali Khan",
-      "fatherName": "Ahmed Khan",
-      "dob": "2015-05-14",
-      "gender": "Male",
-      "rollNo": "2026-001",
-      "class": "5",
-      "section": "A",
-      "mobile": "0300-1234567",
-      "photo": "/uploads/photo-1781423600412-918445536.png",
-      "transport": false,
-      "busRoute": "",
-      "hostel": false,
-      "isActive": true,
-      "is_active": true,
-      "createdAt": "2026-06-14T12:00:00.000Z",
-      "updatedAt": "2026-06-14T12:00:00.000Z"
-    }
-  }
-  ```
+Update fields in a fee record. Changing `studentId` or `month` is forbidden.
 
----
-
-### 4. Update Student Details
 - **Method**: `PUT`
-- **URL**: `http://localhost:5000/api/students/:id`
+- **URL**: `http://localhost:5000/api/fees/:id`
 - **Headers**:
   - `Authorization: Bearer <token>`
-- **Postman Setup**:
-  1. Replace `:id` in URL with the student ID to update.
-  2. Go to **Body** tab, select **form-data**.
-  3. Append fields you wish to update (e.g. `fullName`, `class`, or upload new documents).
-
-- **Expected Response (200 OK)**:
+  - `Content-Type: application/json`
+- **Postman Setup**: Replace `:id` with the numerical fee record ID (e.g., `1`).
+- **Body (raw JSON)**:
   ```json
   {
-    "success": true,
-    "message": "Student updated successfully",
-    "student": {
-      "id": "std_963473456",
-      "fullName": "Ali Khan Updated",
-      "class": "6",
-      "section": "B",
-      "updatedAt": "2026-06-14T12:05:00.000Z"
-    }
+    "amount": 5500,
+    "paymentDate": "2026-06-16",
+    "paymentMethod": "EasyPaisa",
+    "status": "Paid",
+    "remarks": "Tuition Fee updated with penalty"
   }
   ```
-
----
-
-### 5. Delete Student
-- **Method**: `DELETE`
-- **URL**: `http://localhost:5000/api/students/:id`
-- **Headers**:
-  - `Authorization: Bearer <token>`
-- **Postman Setup**: Replace `:id` with the student ID to remove.
-
 - **Expected Response (200 OK)**:
   ```json
   {
     "success": true,
-    "message": "Student deleted successfully"
-  }
-  ```
-
----
-
-### 6. Get Student Fee Details
-- **Method**: `GET`
-- **URL**: `http://localhost:5000/api/students/:id/fees`
-- **Headers**:
-  - `Authorization: Bearer <token>`
-- **Postman Setup**: Replace `:id` with the student ID.
-
-- **Expected Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Student fee details retrieved successfully",
-    "fees": {
-      "january": {
-        "status": "pending",
-        "amount": 5000,
-        "paid_amount": 0,
-        "due_amount": 5000,
-        "paid_at": null,
-        "remarks": ""
+    "message": "Fee updated successfully.",
+    "data": {
+      "id": 1,
+      "studentId": {
+        "id": "std_135428019",
+        "name": "Ali Khan",
+        "admissionNo": "std_135428019",
+        "class": "Grade 5",
+        "section": "Green",
+        "rollNumber": "2026-268"
       },
-      "february": {
-        "status": "paid",
-        "amount": 5000,
-        "paid_amount": 5000,
-        "due_amount": 0,
-        "paid_at": "2026-06-14",
-        "remarks": "Paid in full"
-      }
+      "month": "January",
+      "amount": 5500,
+      "paymentDate": "2026-06-16",
+      "paymentMethod": "EasyPaisa",
+      "status": "Paid",
+      "remarks": "Tuition Fee updated with penalty",
+      "createdBy": 1,
+      "createdAt": "2026-06-15T20:30:46.000Z",
+      "updatedAt": "2026-06-16T12:00:00.000Z"
     }
   }
   ```
 
 ---
 
-### 7. Update Monthly Fee Details
-- **Method**: `PATCH`
-- **URL**: `http://localhost:5000/api/students/:id/fees/:month`
+### 5. Delete Fee Record
+
+Delete a fee record.
+
+- **Method**: `DELETE`
+- **URL**: `http://localhost:5000/api/fees/:id`
 - **Headers**:
   - `Authorization: Bearer <token>`
-  - `Content-Type: application/json`
-- **Postman Setup**:
-  1. Replace `:id` with the student ID, and `:month` with a valid month (e.g. `january` or `february`).
-  2. Go to **Body** tab, select **raw**, choose **JSON**, and paste a payload.
-- **Body (raw JSON)**:
-  ```json
-  {
-    "amount": 6000,
-    "paid_amount": 2000,
-    "paid_at": "2026-06-14",
-    "remarks": "Partial fee update"
-  }
-  ```
+- **Postman Setup**: Replace `:id` with the fee record ID (e.g., `1`).
 - **Expected Response (200 OK)**:
   ```json
   {
     "success": true,
-    "message": "Monthly fee details updated successfully",
-    "month": {
-      "status": "partial",
-      "amount": 6000,
-      "paid_amount": 2000,
-      "due_amount": 4000,
-      "paid_at": "2026-06-14",
-      "remarks": "Partial fee update"
-    }
+    "message": "Fee record deleted successfully."
   }
   ```
 
 ---
 
-### 8. Mark Fee as Paid (Incremental Payment)
-- **Method**: `POST`
-- **URL**: `http://localhost:5000/api/students/:id/fees/:month/pay`
-- **Headers**:
-  - `Authorization: Bearer <token>`
-  - `Content-Type: application/json`
-- **Postman Setup**:
-  1. Replace `:id` with the student ID, and `:month` with the month name (e.g. `january`).
-  2. Go to **Body** tab, select **raw**, choose **JSON**, and paste the payment amount.
-- **Body (raw JSON)**:
-  ```json
-  {
-    "amount": 4000,
-    "remarks": "Final payment"
-  }
-  ```
-- **Expected Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Fee payment recorded successfully",
-    "month": {
-      "status": "paid",
-      "amount": 6000,
-      "paid_amount": 6000,
-      "due_amount": 0,
-      "paid_at": "2026-06-14",
-      "remarks": "Final payment"
+## 3. Frontend Integration Guidelines (React / RTK Query)
+
+The frontend project utilizes **Redux Toolkit Query (RTK Query)**. Follow these steps to integrate:
+
+### Step 1: Add new tag types to the base API
+
+Open your base API definition at `school-frontend/src/services/index.js` and ensure `"Fee"` and `"StudentFeesList"` are registered in `tagTypes`:
+
+```javascript
+export const baseApi = createApi({
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({ ... }),
+  tagTypes: ["Student", "StudentFees", "Fee", "StudentFeesList"], // <-- Add 'Fee' and 'StudentFeesList'
+  endpoints: () => ({}),
+});
+```
+
+### Step 2: Create `feeService.js` API injection
+
+Create a new file `school-frontend/src/services/private/feeService.js` and paste the following content:
+
+```javascript
+import { baseApi } from "../index";
+
+export const feeApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    // GET /api/fees
+    getFees: builder.query({
+      query: (params) => ({
+        url: "fees",
+        method: "GET",
+        params,
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? [...result.data.map(({ id }) => ({ type: "Fee", id })), { type: "Fee", id: "LIST" }]
+          : [{ type: "Fee", id: "LIST" }],
+    }),
+
+    // GET /api/fees/student/:studentId
+    getStudentFeesList: builder.query({
+      query: (studentId) => ({
+        url: `fees/student/${studentId}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, studentId) => [{ type: "StudentFeesList", id: studentId }],
+    }),
+
+    // POST /api/fees
+    createFee: builder.mutation({
+      query: (body) => ({
+        url: "fees",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: (result, error, { studentId }) => [
+        { type: "Fee", id: "LIST" },
+        { type: "StudentFeesList", id: studentId },
+      ],
+    }),
+
+    // PUT /api/fees/:id
+    updateFee: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `fees/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (result, error, { id, studentId }) => [
+        { type: "Fee", id },
+        { type: "Fee", id: "LIST" },
+        { type: "StudentFeesList", id: studentId },
+      ],
+    }),
+
+    // DELETE /api/fees/:id
+    deleteFee: builder.mutation({
+      query: ({ id, studentId }) => ({
+        url: `fees/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { studentId }) => [
+        { type: "Fee", id: "LIST" },
+        { type: "StudentFeesList", id: studentId },
+      ],
+    }),
+  }),
+});
+
+export const {
+  useGetFeesQuery,
+  useGetStudentFeesListQuery,
+  useCreateFeeMutation,
+  useUpdateFeeMutation,
+  useDeleteFeeMutation,
+} = feeApi;
+```
+
+### Step 3: Integrate inside React Components
+
+Use the auto-generated hooks to fetch or mutate fee data directly in your pages:
+
+```jsx
+import React, { useState } from "react";
+import {
+  useGetStudentFeesListQuery,
+  useCreateFeeMutation,
+} from "../../../services/private/feeService";
+
+const StudentFeeList = ({ studentId }) => {
+  const { data, isLoading } = useGetStudentFeesListQuery(studentId);
+  const [createFee, { isLoading: isCreating }] = useCreateFeeMutation();
+
+  const handleAddFee = async () => {
+    try {
+      await createFee({
+        studentId,
+        month: "January",
+        amount: 5000,
+        paymentDate: "2026-06-15",
+        paymentMethod: "Cash",
+        remarks: "Tuition Fee",
+      }).unwrap();
+      alert("Fee added successfully!");
+    } catch (err) {
+      alert(err.data?.message || "Error occurred");
     }
-  }
-  ```
+  };
 
----
+  if (isLoading) return <div>Loading fees...</div>;
 
-## 3. Testing Error Scenarios
-
-- **Unauthorized (401)**: Remove the `Authorization` header and request any endpoint. You should get a `401 Unauthorized` status.
-- **Validation Failed (400)**: Try sending a POST to `/admission` without a `fullName` or `mobile`. The response will be `400 Bad Request` containing:
-  ```json
-  {
-    "success": false,
-    "message": "Validation failed",
-    "errors": {
-      "fullName": "Full name is required",
-      "mobile": "Mobile number is required"
-    }
-  }
-  ```
-- **Student Not Found (404)**: Request details for an ID that doesn't exist (e.g. `/api/students/std_non_existent`). You will get `404 Not Found`.
+  return (
+    <div>
+      <h3>Monthly Fee History</h3>
+      <ul>
+        {data?.data?.map((fee) => (
+          <li key={fee.id}>
+            {fee.month}: {fee.amount} PKR - {fee.status} ({fee.paymentMethod})
+          </li>
+        ))}
+      </ul>
+      <button onClick={handleAddFee} disabled={isCreating}>
+        Add January Fee
+      </button>
+    </div>
+  );
+};
+```

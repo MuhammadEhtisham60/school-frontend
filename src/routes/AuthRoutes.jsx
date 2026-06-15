@@ -6,16 +6,16 @@ import ForgotPasswordFlow from "@/pages/auth/ForgotPasswordFlow";
 export const authRoutes = [
   {
     path: "/login",
-    element: <LoginPage />
+    element: <LoginPage />,
   },
   {
     path: "/signup",
-    element: <SignupPage />
+    element: <SignupPage />,
   },
   {
     path: "/forgot-password",
-    element: <ForgotPasswordFlow />
-  }
+    element: <ForgotPasswordFlow />,
+  },
 ];
 
 export default authRoutes;

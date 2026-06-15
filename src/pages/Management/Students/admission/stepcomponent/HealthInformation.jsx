@@ -17,12 +17,7 @@ export function HealthInformation() {
         placeholder="Allergies, chronic conditions, etc."
         full
       />
-      <FormikText
-        name="disability"
-        label="Disability (if any)"
-        placeholder="None / specify"
-        full
-      />
+      <FormikText name="disability" label="Disability (if any)" placeholder="None / specify" full />
     </Section>
   );
 }

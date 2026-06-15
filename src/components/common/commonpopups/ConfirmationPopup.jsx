@@ -59,7 +59,9 @@ export const ConfirmationPopup = ({
     >
       <div className="flex flex-col items-center text-center p-2">
         {/* Visual context icon (warning or help) */}
-        <div className={`flex h-16 w-16 items-center justify-center rounded-full mb-6 border shadow-sm ${currentTheme.iconBg} animate-fade-in-up`}>
+        <div
+          className={`flex h-16 w-16 items-center justify-center rounded-full mb-6 border shadow-sm ${currentTheme.iconBg} animate-fade-in-up`}
+        >
           {confirmColor === "error" || confirmColor === "warning" ? (
             <AlertTriangle className={`h-8 w-8 ${currentTheme.iconColor}`} />
           ) : (
@@ -68,15 +70,11 @@ export const ConfirmationPopup = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">{title}</h3>
 
         {/* Message */}
         {message && (
-          <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">
-            {message}
-          </p>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">{message}</p>
         )}
 
         {/* Responsive footer buttons */}

@@ -87,9 +87,7 @@ function NoticePage() {
         actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <PrimaryButton startIcon={<Plus className="h-4 w-4" />}>
-                Add Notice
-              </PrimaryButton>
+              <PrimaryButton startIcon={<Plus className="h-4 w-4" />}>Add Notice</PrimaryButton>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
@@ -144,13 +142,9 @@ function NoticePage() {
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <CancelButton>
-                      Cancel
-                    </CancelButton>
+                    <CancelButton>Cancel</CancelButton>
                   </DialogClose>
-                  <SubmitButton>
-                    Publish Notice
-                  </SubmitButton>
+                  <SubmitButton>Publish Notice</SubmitButton>
                 </DialogFooter>
               </form>
             </DialogContent>

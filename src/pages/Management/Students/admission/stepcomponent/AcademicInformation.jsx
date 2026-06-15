@@ -1,9 +1,5 @@
 import { Section } from "./Section";
-import {
-  FormikSelect,
-  FormikText,
-  FormikDatePicker,
-} from "@/components/common/sharedfields";
+import { FormikSelect, FormikText, FormikDatePicker } from "@/components/common/sharedfields";
 
 export function AcademicInformation() {
   return (

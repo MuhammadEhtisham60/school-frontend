@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  useGetStudentQuery,
-} from "@/services/private/studentService";
+import { useGetStudentQuery } from "@/services/private/studentService";
 import {
   useGetStudentFeesListQuery,
   useCreateFeeMutation,
@@ -104,7 +102,11 @@ export default function StudentDetailsPage() {
   });
 
   // API mutations & query
-  const { data: feesData, isLoading: isFeesLoading, error: feesError } = useGetStudentFeesListQuery(id, { skip: !id });
+  const {
+    data: feesData,
+    isLoading: isFeesLoading,
+    error: feesError,
+  } = useGetStudentFeesListQuery(id, { skip: !id });
   const [createFee, { isLoading: isCreatingFee }] = useCreateFeeMutation();
   const [updateFee, { isLoading: isUpdatingFee }] = useUpdateFeeMutation();
   const [deleteFee, { isLoading: isDeletingFee }] = useDeleteFeeMutation();
@@ -218,10 +220,29 @@ export default function StudentDetailsPage() {
 
   const feeRecords = feesData?.data || [];
   const totalBilled = feeRecords.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
-  const totalPaid = feeRecords.reduce((acc, f) => acc + (f.status?.toLowerCase() === "paid" ? (Number(f.amount) || 0) : 0), 0);
-  const totalDue = feeRecords.reduce((acc, f) => acc + (f.status?.toLowerCase() === "pending" ? (Number(f.amount) || 0) : 0), 0);
+  const totalPaid = feeRecords.reduce(
+    (acc, f) => acc + (f.status?.toLowerCase() === "paid" ? Number(f.amount) || 0 : 0),
+    0,
+  );
+  const totalDue = feeRecords.reduce(
+    (acc, f) => acc + (f.status?.toLowerCase() === "pending" ? Number(f.amount) || 0 : 0),
+    0,
+  );
 
-  const MONTHS_ORDER = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const MONTHS_ORDER = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   const configuredMonths = new Set(feeRecords.map((f) => f.month.trim().toLowerCase()));
   const availableMonths = MONTHS_ORDER.filter((m) => !configuredMonths.has(m.toLowerCase()));
 
@@ -245,7 +266,8 @@ export default function StudentDetailsPage() {
           <div>
             <p className="font-semibold text-lg">Student Profile Not Found</p>
             <p className="text-sm opacity-90">
-              {error?.data?.message || "We couldn't retrieve details for this student. Verify the ID."}
+              {error?.data?.message ||
+                "We couldn't retrieve details for this student. Verify the ID."}
             </p>
           </div>
         </Card>
@@ -256,7 +278,12 @@ export default function StudentDetailsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Button variant="outline" size="sm" onClick={() => navigate("/students")} className="gap-2 self-start">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/students")}
+          className="gap-2 self-start"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Directory
         </Button>
         <Button
@@ -283,12 +310,22 @@ export default function StudentDetailsPage() {
               <StatusBadge status={student.feeStatus || "Paid"} />
             </div>
             <p className="text-sm font-semibold text-primary flex items-center justify-center md:justify-start gap-1">
-              <GraduationCap className="h-4 w-4 text-primary" /> Class {student.class} — Section {student.section}
+              <GraduationCap className="h-4 w-4 text-primary" /> Class {student.class} — Section{" "}
+              {student.section}
             </p>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-muted-foreground font-medium">
-              <p>Roll No: <span className="font-mono text-foreground font-bold">#{student.rollNo || "N/A"}</span></p>
-              <p>DOB: <span className="text-foreground">{student.dob}</span></p>
-              <p>Contact: <span className="text-foreground">{student.mobile}</span></p>
+              <p>
+                Roll No:{" "}
+                <span className="font-mono text-foreground font-bold">
+                  #{student.rollNo || "N/A"}
+                </span>
+              </p>
+              <p>
+                DOB: <span className="text-foreground">{student.dob}</span>
+              </p>
+              <p>
+                Contact: <span className="text-foreground">{student.mobile}</span>
+              </p>
             </div>
           </div>
         </CardContent>
@@ -297,10 +334,18 @@ export default function StudentDetailsPage() {
       {/* Tabs */}
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid grid-cols-4 w-full md:max-w-xl bg-muted rounded-xl p-1 mb-6">
-          <TabsTrigger value="basic" className="rounded-lg py-2 text-xs font-semibold">Basic Info</TabsTrigger>
-          <TabsTrigger value="fees" className="rounded-lg py-2 text-xs font-semibold">Fee Info</TabsTrigger>
-          <TabsTrigger value="results" className="rounded-lg py-2 text-xs font-semibold">Results Info</TabsTrigger>
-          <TabsTrigger value="other" className="rounded-lg py-2 text-xs font-semibold">Other Info</TabsTrigger>
+          <TabsTrigger value="basic" className="rounded-lg py-2 text-xs font-semibold">
+            Basic Info
+          </TabsTrigger>
+          <TabsTrigger value="fees" className="rounded-lg py-2 text-xs font-semibold">
+            Fee Info
+          </TabsTrigger>
+          <TabsTrigger value="results" className="rounded-lg py-2 text-xs font-semibold">
+            Results Info
+          </TabsTrigger>
+          <TabsTrigger value="other" className="rounded-lg py-2 text-xs font-semibold">
+            Other Info
+          </TabsTrigger>
         </TabsList>
 
         {/* Basic Info Tab */}
@@ -343,7 +388,10 @@ export default function StudentDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <DetailRow label="Father's Full Name" value={student.fatherFullName || student.fatherName} />
+                <DetailRow
+                  label="Father's Full Name"
+                  value={student.fatherFullName || student.fatherName}
+                />
                 <DetailRow label="Father's CNIC" value={student.fatherCNIC} />
                 <DetailRow label="Occupation" value={student.occupation} />
                 <DetailRow label="Father's Phone" value={student.fatherPhone} />
@@ -391,7 +439,9 @@ export default function StudentDetailsPage() {
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-primary" /> Fee Billing Dashboard
                 </CardTitle>
-                <p className="text-xs text-muted-foreground">Monitor transaction status and schedules.</p>
+                <p className="text-xs text-muted-foreground">
+                  Monitor transaction status and schedules.
+                </p>
               </div>
               <StatusBadge status={student.feeStatus || "Paid"} />
             </CardHeader>
@@ -399,30 +449,46 @@ export default function StudentDetailsPage() {
               {isFeesLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-2">
                   <Loader2 className="h-8 w-8 animate-spin text-primary animate-pulse" />
-                  <p className="text-xs text-muted-foreground font-semibold">Loading fee records...</p>
+                  <p className="text-xs text-muted-foreground font-semibold">
+                    Loading fee records...
+                  </p>
                 </div>
               ) : feesError ? (
                 <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-xl flex items-center gap-3 text-destructive">
                   <AlertCircle className="h-5 w-5" />
                   <div className="text-xs">
                     <p className="font-bold">Failed to load fee records</p>
-                    <p className="opacity-90">{feesError?.data?.message || "Verify your connection or server status."}</p>
+                    <p className="opacity-90">
+                      {feesError?.data?.message || "Verify your connection or server status."}
+                    </p>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="grid sm:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl border bg-muted/20">
-                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Billed</p>
-                      <p className="text-xl font-bold mt-1 text-primary">Rs. {totalBilled.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">
+                        Total Billed
+                      </p>
+                      <p className="text-xl font-bold mt-1 text-primary">
+                        Rs. {totalBilled.toLocaleString()}
+                      </p>
                     </div>
                     <div className="p-4 rounded-xl border bg-muted/20">
-                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Paid</p>
-                      <p className="text-xl font-bold mt-1 text-success">Rs. {totalPaid.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">
+                        Total Paid
+                      </p>
+                      <p className="text-xl font-bold mt-1 text-success">
+                        Rs. {totalPaid.toLocaleString()}
+                      </p>
                     </div>
                     <div className="p-4 rounded-xl border bg-muted/20">
-                      <p className="text-xs text-muted-foreground font-semibold uppercase">Total Due</p>
-                      <p className={`text-xl font-bold mt-1 ${totalDue > 0 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase">
+                        Total Due
+                      </p>
+                      <p
+                        className={`text-xl font-bold mt-1 ${totalDue > 0 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}
+                      >
                         Rs. {totalDue.toLocaleString()}
                       </p>
                     </div>
@@ -441,7 +507,7 @@ export default function StudentDetailsPage() {
                             paymentDate: new Date().toISOString().split("T")[0],
                             paymentMethod: "Cash",
                             status: "Paid",
-                            remarks: ""
+                            remarks: "",
                           });
                           setIsAddOpen(true);
                         }}
@@ -468,7 +534,10 @@ export default function StudentDetailsPage() {
                         <tbody>
                           {feeRecords.length === 0 ? (
                             <tr>
-                              <td colSpan={7} className="p-6 text-center text-muted-foreground text-xs">
+                              <td
+                                colSpan={7}
+                                className="p-6 text-center text-muted-foreground text-xs"
+                              >
                                 No fee statements set up for this student.
                               </td>
                             </tr>
@@ -483,19 +552,27 @@ export default function StudentDetailsPage() {
                               })
                               .map((fee) => {
                                 return (
-                                  <tr key={fee.id} className="border-b hover:bg-muted/10 transition-colors">
+                                  <tr
+                                    key={fee.id}
+                                    className="border-b hover:bg-muted/10 transition-colors"
+                                  >
                                     <td className="p-3 font-semibold">{fee.month}</td>
                                     <td className="p-3">
                                       <StatusBadge status={fee.status || "Pending"} />
                                     </td>
-                                    <td className="p-3 font-medium">Rs. {(fee.amount || 0).toLocaleString()}</td>
+                                    <td className="p-3 font-medium">
+                                      Rs. {(fee.amount || 0).toLocaleString()}
+                                    </td>
                                     <td className="p-3 text-xs text-muted-foreground">
                                       {fee.paymentDate || "—"}
                                     </td>
                                     <td className="p-3 text-xs text-muted-foreground">
                                       {fee.paymentMethod || "—"}
                                     </td>
-                                    <td className="p-3 text-xs max-w-[150px] truncate" title={fee.remarks}>
+                                    <td
+                                      className="p-3 text-xs max-w-[150px] truncate"
+                                      title={fee.remarks}
+                                    >
                                       {fee.remarks || "—"}
                                     </td>
                                     <td className="p-3 text-right">
@@ -556,7 +633,10 @@ export default function StudentDetailsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <DetailRow label="Previous School" value={student.prevSchool} />
-                <DetailRow label="Previous Percentage / Grade" value={student.lastResult ? `${student.lastResult}%` : undefined} />
+                <DetailRow
+                  label="Previous Percentage / Grade"
+                  value={student.lastResult ? `${student.lastResult}%` : undefined}
+                />
                 <DetailRow label="Enrollment Date" value={student.admissionDate} />
               </CardContent>
             </Card>
@@ -571,7 +651,9 @@ export default function StudentDetailsPage() {
                 <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
                   <GraduationCap className="h-12 w-12 text-muted-foreground/30 mb-2" />
                   <h4 className="font-semibold text-foreground">No Current Term Results</h4>
-                  <p className="text-xs max-w-xs mt-1">Academic records for this class session are pending final review and publishes.</p>
+                  <p className="text-xs max-w-xs mt-1">
+                    Academic records for this class session are pending final review and publishes.
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -588,8 +670,16 @@ export default function StudentDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <DetailRow label="Subscribed to Transport" value={student.transport ? "Yes" : "No"} />
-                {student.transport && <DetailRow label="Route details / Bus ID" value={student.busRoute || "Route A (Faisalabad)"} />}
+                <DetailRow
+                  label="Subscribed to Transport"
+                  value={student.transport ? "Yes" : "No"}
+                />
+                {student.transport && (
+                  <DetailRow
+                    label="Route details / Bus ID"
+                    value={student.busRoute || "Route A (Faisalabad)"}
+                  />
+                )}
               </CardContent>
             </Card>
 
@@ -601,7 +691,9 @@ export default function StudentDetailsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <DetailRow label="Living in Hostel" value={student.hostel ? "Yes" : "No"} />
-                {student.hostel && <DetailRow label="Room Number" value="Hostel Wing B, Room 102" />}
+                {student.hostel && (
+                  <DetailRow label="Room Number" value="Hostel Wing B, Room 102" />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -613,7 +705,8 @@ export default function StudentDetailsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2">
-              <Pencil className="h-5 w-5 text-primary" /> Edit {selectedFee ? selectedFee.month : ""} Fee Details
+              <Pencil className="h-5 w-5 text-primary" /> Edit{" "}
+              {selectedFee ? selectedFee.month : ""} Fee Details
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveEdit} className="space-y-4 py-2">
@@ -678,10 +771,19 @@ export default function StudentDetailsPage() {
               />
             </div>
             <DialogFooter className="gap-2 sm:gap-0 mt-4">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} disabled={isUpdatingFee}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditOpen(false)}
+                disabled={isUpdatingFee}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isUpdatingFee}>
+              <Button
+                type="submit"
+                className="gradient-primary text-primary-foreground border-0 font-semibold"
+                disabled={isUpdatingFee}
+              >
                 {isUpdatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Save Changes
               </Button>
@@ -695,7 +797,8 @@ export default function StudentDetailsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-success" /> Record {selectedFee ? selectedFee.month : ""} Fee Payment
+              <CreditCard className="h-5 w-5 text-success" /> Record{" "}
+              {selectedFee ? selectedFee.month : ""} Fee Payment
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSavePay} className="space-y-4 py-2">
@@ -706,7 +809,9 @@ export default function StudentDetailsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Original Fee:</span>
-                <span className="font-semibold">Rs. {(selectedFee?.amount || 0).toLocaleString()}</span>
+                <span className="font-semibold">
+                  Rs. {(selectedFee?.amount || 0).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between text-destructive font-bold border-t pt-1 mt-1">
                 <span>Remaining Due:</span>
@@ -750,10 +855,19 @@ export default function StudentDetailsPage() {
               />
             </div>
             <DialogFooter className="gap-2 sm:gap-0 mt-4">
-              <Button type="button" variant="outline" onClick={() => setIsPayOpen(false)} disabled={isUpdatingFee}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsPayOpen(false)}
+                disabled={isUpdatingFee}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isUpdatingFee}>
+              <Button
+                type="submit"
+                className="gradient-primary text-primary-foreground border-0 font-semibold"
+                disabled={isUpdatingFee}
+              >
                 {isUpdatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Record Payment
               </Button>
@@ -780,7 +894,9 @@ export default function StudentDetailsPage() {
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 required
               >
-                <option value="" disabled>Select a month...</option>
+                <option value="" disabled>
+                  Select a month...
+                </option>
                 {availableMonths.map((m) => (
                   <option key={m} value={m}>
                     {m}
@@ -849,10 +965,19 @@ export default function StudentDetailsPage() {
               />
             </div>
             <DialogFooter className="gap-2 sm:gap-0 mt-4">
-              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} disabled={isCreatingFee}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddOpen(false)}
+                disabled={isCreatingFee}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="gradient-primary text-primary-foreground border-0 font-semibold" disabled={isCreatingFee}>
+              <Button
+                type="submit"
+                className="gradient-primary text-primary-foreground border-0 font-semibold"
+                disabled={isCreatingFee}
+              >
                 {isCreatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Add Configuration
               </Button>

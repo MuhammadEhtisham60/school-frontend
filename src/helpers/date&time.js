@@ -1,10 +1,10 @@
 // utils/dateUtils.js
 export const formatDate = (date) => {
-  if (!date) return '';
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 
@@ -14,11 +14,11 @@ export const formatDate = (date) => {
  * @returns {string} Formatted date string
  */
 export const formatDateDDMMYYYY = (date) => {
-  if (!date) return '-';
+  if (!date) return "-";
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '-';
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
+  if (isNaN(d.getTime())) return "-";
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 };
@@ -29,9 +29,9 @@ export const formatDateDDMMYYYY = (date) => {
  * @returns {string} Time ago string
  */
 export const calculateTimeAgo = (date) => {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) return "";
 
   const now = new Date();
   const seconds = Math.floor((now - d) / 1000);
@@ -59,18 +59,17 @@ export const calculateTimeAgo = (date) => {
   return Math.floor(seconds) + " seconds ago";
 };
 
-
 export const formatDateTime = (timestamp) => {
-  if (!timestamp) return '';
+  if (!timestamp) return "";
 
   const date = new Date(timestamp);
 
-  return date.toLocaleString('en-US', {
-    month: 'short',   // Mar
-    day: '2-digit',   // 16
-    year: 'numeric',  // 2026
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false     // 24-hour format
+  return date.toLocaleString("en-US", {
+    month: "short", // Mar
+    day: "2-digit", // 16
+    year: "numeric", // 2026
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false, // 24-hour format
   });
 };

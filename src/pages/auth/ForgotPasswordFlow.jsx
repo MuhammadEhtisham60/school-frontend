@@ -186,7 +186,9 @@ function ForgotPasswordFlow() {
               </div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground">Verify OTP Code</h2>
               <p className="text-sm text-muted-foreground">
-                We've sent a 6-digit verification code to <span className="font-medium text-foreground">{email}</span>. The code is valid for 5 minutes.
+                We've sent a 6-digit verification code to{" "}
+                <span className="font-medium text-foreground">{email}</span>. The code is valid for
+                5 minutes.
               </p>
             </div>
           )}
@@ -286,8 +288,8 @@ function ForgotPasswordFlow() {
                   {isResending
                     ? "Resending..."
                     : countdown > 0
-                    ? `Resend OTP in ${formatCountdown(countdown)}`
-                    : "Resend OTP"}
+                      ? `Resend OTP in ${formatCountdown(countdown)}`
+                      : "Resend OTP"}
                 </Button>
 
                 <button

@@ -11,10 +11,7 @@ export const feeApi = baseApi.injectEndpoints({
       }),
       providesTags: (result) =>
         result?.data
-          ? [
-              ...result.data.map(({ id }) => ({ type: "Fee", id })),
-              { type: "Fee", id: "LIST" },
-            ]
+          ? [...result.data.map(({ id }) => ({ type: "Fee", id })), { type: "Fee", id: "LIST" }]
           : [{ type: "Fee", id: "LIST" }],
     }),
 
@@ -24,9 +21,7 @@ export const feeApi = baseApi.injectEndpoints({
         url: `fees/student/${studentId}`,
         method: "GET",
       }),
-      providesTags: (result, error, studentId) => [
-        { type: "StudentFeesList", id: studentId }
-      ],
+      providesTags: (result, error, studentId) => [{ type: "StudentFeesList", id: studentId }],
     }),
 
     // POST /api/fees

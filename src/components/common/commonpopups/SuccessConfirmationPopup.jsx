@@ -46,15 +46,11 @@ export const SuccessConfirmationPopup = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">{title}</h3>
 
         {/* Message */}
         {message && (
-          <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">
-            {message}
-          </p>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs">{message}</p>
         )}
 
         {/* Action Button */}

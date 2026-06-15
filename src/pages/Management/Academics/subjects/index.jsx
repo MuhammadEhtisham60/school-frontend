@@ -94,9 +94,7 @@ function SubjectsPage() {
         actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <PrimaryButton startIcon={<Plus className="h-4 w-4" />}>
-                Add Subject
-              </PrimaryButton>
+              <PrimaryButton startIcon={<Plus className="h-4 w-4" />}>Add Subject</PrimaryButton>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
@@ -139,13 +137,9 @@ function SubjectsPage() {
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <CancelButton>
-                      Cancel
-                    </CancelButton>
+                    <CancelButton>Cancel</CancelButton>
                   </DialogClose>
-                  <SubmitButton>
-                    Save Subject
-                  </SubmitButton>
+                  <SubmitButton>Save Subject</SubmitButton>
                 </DialogFooter>
               </form>
             </DialogContent>

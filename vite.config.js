@@ -7,10 +7,7 @@ import { defineConfig } from "vite";
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command }) => ({
-  plugins: [
-    viteReact(),
-    tailwindcss(),
-  ],
+  plugins: [viteReact(), tailwindcss()],
 
   server: {
     port: 3005,
@@ -21,4 +18,3 @@ export default defineConfig(({ command }) => ({
     },
   },
 }));
-

@@ -26,7 +26,7 @@ export function FormikCheckBox({
           "flex items-center justify-between p-4 rounded-xl border bg-muted/30",
           full && "md:col-span-2",
           isError && "border-destructive",
-          className
+          className,
         )}
       >
         <div className="space-y-0.5">
@@ -38,15 +38,11 @@ export function FormikCheckBox({
               {label} {required && <span className="text-destructive">*</span>}
             </Label>
           )}
-          {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="text-xs text-muted-foreground">{description}</p>}
           {helperText && !isError && (
             <p className="text-[0.8rem] text-muted-foreground">{helperText}</p>
           )}
-          {isError && (
-            <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>
-          )}
+          {isError && <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>}
         </div>
         <Switch
           id={name}
@@ -73,25 +69,18 @@ export function FormikCheckBox({
           {label && (
             <Label
               htmlFor={name}
-              className={cn(
-                "text-sm font-medium cursor-pointer",
-                isError && "text-destructive"
-              )}
+              className={cn("text-sm font-medium cursor-pointer", isError && "text-destructive")}
             >
               {label} {required && <span className="text-destructive">*</span>}
             </Label>
           )}
-          {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="text-xs text-muted-foreground">{description}</p>}
         </div>
       </div>
       {helperText && !isError && (
         <p className="text-[0.8rem] text-muted-foreground">{helperText}</p>
       )}
-      {isError && (
-        <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>
-      )}
+      {isError && <p className="text-[0.8rem] font-medium text-destructive">{meta.error}</p>}
     </div>
   );
 }

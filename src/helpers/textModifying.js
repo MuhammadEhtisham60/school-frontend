@@ -1,19 +1,19 @@
 // utils/stringUtils.js
-export const capitalizeFirstLetter = (value = '') => {
+export const capitalizeFirstLetter = (value = "") => {
   if (!value) return value;
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
-export const formatFileNameFromUrl = (url = '') => {
-  if (!url) return '';
+export const formatFileNameFromUrl = (url = "") => {
+  if (!url) return "";
 
   // Extract filename
   const match = url.match(/\/([^\/?#]+)(?:\?|#|$)/);
-  if (!match) return '';
+  if (!match) return "";
 
   const fileName = decodeURIComponent(match[1]);
 
   // Split name and extension
-  const lastDotIndex = fileName.lastIndexOf('.');
+  const lastDotIndex = fileName.lastIndexOf(".");
   if (lastDotIndex === -1) return fileName;
 
   const name = fileName.slice(0, lastDotIndex);
@@ -28,34 +28,24 @@ export const formatFileNameFromUrl = (url = '') => {
   return `${firstPart}...${lastCharBeforeDot}${extension}`;
 };
 
+export const formatTextChatTitle = (text = "", limit = 20) => {
+  if (!text) return "";
 
-export const formatTextChatTitle = (text = '', limit = 20) => {
-  if (!text) return '';
+  const formatted = text.charAt(0).toUpperCase() + text.slice(1);
 
-  const formatted =
-    text.charAt(0).toUpperCase() + text.slice(1);
-
-  return formatted.length > limit
-    ? formatted.slice(0, limit) + '...'
-    : formatted;
+  return formatted.length > limit ? formatted.slice(0, limit) + "..." : formatted;
 };
-
-
 
 export const formatLabel = (text) => {
-  return text
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return text.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-
-
 export const formatLabeltoLower = (text) => {
-  if (!text) return ''; // handle undefined, null, empty
+  if (!text) return ""; // handle undefined, null, empty
 
   return text
     .toString()
     .toLowerCase()
-    .replace(/_/g, ' ')
+    .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };

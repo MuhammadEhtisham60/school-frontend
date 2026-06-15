@@ -13,12 +13,7 @@ export function PersonalInformation() {
       <FormikText name="fatherName" label="Father's Name" placeholder="e.g. Ahmed Khan" required />
       <FormikText name="rollNo" label="Roll Number" placeholder="Auto / Manual" />
       <FormikDatePicker name="dob" label="Date of Birth" required />
-      <FormikRadio
-        name="gender"
-        label="Gender"
-        required
-        options={["Male", "Female", "Other"]}
-      />
+      <FormikRadio name="gender" label="Gender" required options={["Male", "Female", "Other"]} />
       <FormikText name="cnic" label="B-Form / CNIC" placeholder="12345-1234567-1" />
       <FormikFile name="photo" label="Profile Photo" />
     </Section>

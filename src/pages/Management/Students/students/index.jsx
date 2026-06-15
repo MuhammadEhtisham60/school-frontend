@@ -30,10 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  useGetStudentsQuery,
-  useDeleteStudentMutation,
-} from "@/services/private/studentService";
+import { useGetStudentsQuery, useDeleteStudentMutation } from "@/services/private/studentService";
 import { Pencil, Trash2, Eye, GraduationCap, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { StatCard } from "@/components/ui/stat-card";
@@ -162,7 +159,9 @@ function StudentsPage() {
         <Card className="p-12 flex justify-center items-center shadow-card">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground font-medium">Loading student directory...</p>
+            <p className="text-sm text-muted-foreground font-medium">
+              Loading student directory...
+            </p>
           </div>
         </Card>
       ) : error ? (
@@ -170,7 +169,9 @@ function StudentsPage() {
           <AlertCircle className="h-5 w-5" />
           <div>
             <p className="font-semibold">Failed to load students</p>
-            <p className="text-sm opacity-90">{error?.data?.message || "An unexpected error occurred"}</p>
+            <p className="text-sm opacity-90">
+              {error?.data?.message || "An unexpected error occurred"}
+            </p>
           </div>
         </Card>
       ) : (
@@ -266,7 +267,8 @@ function StudentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the student profile for <strong>{deleteName}</strong> and remove their record from the server.
+              This will permanently delete the student profile for <strong>{deleteName}</strong> and
+              remove their record from the server.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
