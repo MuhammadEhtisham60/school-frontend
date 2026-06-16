@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetStudentQuery } from "@/services/private/studentService";
+import { useGetClassesQuery } from "@/services/private/classService";
 import {
   useGetStudentFeesListQuery,
   useCreateFeeMutation,
@@ -76,6 +77,18 @@ export default function StudentDetailsPage() {
   const { data, isLoading, error } = useGetStudentQuery(id, { skip: !id });
   const student = data?.student;
 
+  const { data: classesResponse } = useGetClassesQuery();
+  const classesList = classesResponse?.data || [];
+
+  // Find the student's class and retrieve its subjects
+  const studentClassSubjects = useMemo(() => {
+    if (!student?.class || classesList.length === 0) return [];
+    const matchedClass = classesList.find(
+      (c) => c.name.toLowerCase().trim() === student.class.toLowerCase().trim()
+    );
+    return matchedClass?.subjects || [];
+  }, [student?.class, classesList]);
+
   // Fee State Modals & Selection
   const [selectedFee, setSelectedFee] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -147,13 +160,24 @@ export default function StudentDetailsPage() {
   const handleOpenAddResult = () => {
     setSelectedResultRecord(null);
     setSelectedTermName(null);
+
+    // Pre-populate with class subjects if available
+    const defaultSubjects = studentClassSubjects.length > 0
+      ? studentClassSubjects.map((subName) => ({
+          subjectName: subName,
+          totalMarks: 100,
+          obtainedMarks: "",
+          remarks: "",
+        }))
+      : [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }];
+
     setResultForm({
       academicYear: "2026-2027",
       rollNo: student?.rollNo || "",
       promotionStatus: "Pending",
       termName: "First Term",
       remarks: "",
-      subjects: [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+      subjects: defaultSubjects,
     });
     setIsResultOpen(true);
   };
@@ -165,13 +189,23 @@ export default function StudentDetailsPage() {
     const possibleTerms = ["First Term", "Mid Term", "Final Term"];
     const remainingTerms = possibleTerms.filter(t => !configuredTerms.includes(t));
     
+    // Pre-populate with class subjects if available
+    const defaultSubjects = studentClassSubjects.length > 0
+      ? studentClassSubjects.map((subName) => ({
+          subjectName: subName,
+          totalMarks: 100,
+          obtainedMarks: "",
+          remarks: "",
+        }))
+      : [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }];
+
     setResultForm({
       academicYear: record.academicYear,
       rollNo: record.rollNo || student?.rollNo || "",
       promotionStatus: record.promotionStatus || "Pending",
       termName: remainingTerms[0] || "First Term",
       remarks: "",
-      subjects: [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+      subjects: defaultSubjects,
     });
     setIsResultOpen(true);
   };
@@ -903,98 +937,109 @@ export default function StudentDetailsPage() {
                           </div>
                         </CardHeader>
                         <CardContent className="p-4 space-y-6">
-                          {Object.entries(record.terms || {}).map(([termName, termDetails]) => (
-                            <div key={termName} className="space-y-3 border-b last:border-b-0 pb-4 last:pb-0">
-                              <div className="flex items-center justify-between">
-                                <h5 className="font-bold text-xs text-primary">{termName}</h5>
-                                <div className="flex gap-1">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-7 w-7 p-0"
-                                    onClick={() => handleOpenEditResult(record, termName)}
-                                  >
-                                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
-                                    onClick={() => handleDeleteTerm(record.id, termName)}
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
+                          {Object.entries(record.terms || {}).map(([termName, termDetails]) => {
+                            const totalMarksSum = (termDetails.subjects || []).reduce(
+                              (acc, curr) => acc + (Number(curr.totalMarks) || 0),
+                              0
+                            );
+                            const obtainedMarksSum = (termDetails.subjects || []).reduce(
+                              (acc, curr) => acc + (Number(curr.obtainedMarks) || 0),
+                              0
+                            );
+
+                            return (
+                              <div key={termName} className="space-y-3 border-b last:border-b-0 pb-4 last:pb-0">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-bold text-xs text-primary">{termName}</h5>
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => handleOpenEditResult(record, termName)}
+                                    >
+                                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
+                                      onClick={() => handleDeleteTerm(record.id, termName)}
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-muted/30 p-3 rounded-lg text-xs">
-                                <div>
-                                  <span className="text-muted-foreground">Grade:</span>{" "}
-                                  <span className="font-bold text-foreground">
-                                    {termDetails.grade || "—"} ({termDetails.percentage ? `${termDetails.percentage}%` : "—"})
-                                  </span>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-muted/30 p-3 rounded-lg text-xs">
+                                  <div>
+                                    <span className="text-muted-foreground">Grade:</span>{" "}
+                                    <span className="font-bold text-foreground">
+                                      {termDetails.grade || "—"} ({termDetails.percentage ? `${termDetails.percentage}%` : "—"})
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Marks:</span>{" "}
+                                    <span className="font-bold text-foreground">
+                                      {obtainedMarksSum} / {totalMarksSum}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Position:</span>{" "}
+                                    <span className="font-bold text-foreground">
+                                      {termDetails.position ?? "—"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Status:</span>{" "}
+                                    <span className="font-bold text-foreground">
+                                      {termDetails.resultStatus || "—"}
+                                    </span>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span className="text-muted-foreground">GPA:</span>{" "}
-                                  <span className="font-bold text-foreground">
-                                    {termDetails.gpa ?? "—"}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Position:</span>{" "}
-                                  <span className="font-bold text-foreground">
-                                    {termDetails.position ?? "—"}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Status:</span>{" "}
-                                  <span className="font-bold text-foreground">
-                                    {termDetails.resultStatus || "—"}
-                                  </span>
-                                </div>
-                              </div>
-                              {termDetails.remarks && (
-                                <p className="text-[11px] italic text-muted-foreground px-1">
-                                  <strong>Remarks:</strong> {termDetails.remarks}
-                                </p>
-                              )}
-                              <div className="rounded-lg border overflow-hidden">
-                                <table className="w-full text-xs text-left">
-                                  <thead>
-                                    <tr className="bg-muted/50 border-b text-muted-foreground font-semibold">
-                                      <th className="p-2">Subject</th>
-                                      <th className="p-2 text-center">Total</th>
-                                      <th className="p-2 text-center">Obtained</th>
-                                      <th className="p-2 text-center">Grade</th>
-                                      <th className="p-2 text-center">Status</th>
-                                      <th className="p-2">Remarks</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {(termDetails.subjects || []).map((subj, idx) => (
-                                      <tr key={idx} className="border-b last:border-b-0 hover:bg-muted/5 transition-colors">
-                                        <td className="p-2 font-medium">{subj.subjectName}</td>
-                                        <td className="p-2 text-center">{subj.totalMarks}</td>
-                                        <td className="p-2 text-center font-semibold text-foreground">{subj.obtainedMarks}</td>
-                                        <td className="p-2 text-center">
-                                          <span className="px-1.5 py-0.5 rounded font-mono text-[10px] bg-muted font-bold">
-                                            {subj.grade || "—"}
-                                          </span>
-                                        </td>
-                                        <td className="p-2 text-center">
-                                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${subj.status?.toLowerCase() === "pass" ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
-                                            {subj.status || "—"}
-                                          </span>
-                                        </td>
-                                        <td className="p-2 text-muted-foreground truncate max-w-[120px]" title={subj.remarks}>
-                                          {subj.remarks || "—"}
-                                        </td>
+                                {termDetails.remarks && (
+                                  <p className="text-[11px] italic text-muted-foreground px-1">
+                                    <strong>Remarks:</strong> {termDetails.remarks}
+                                  </p>
+                                )}
+                                <div className="rounded-lg border overflow-hidden">
+                                  <table className="w-full text-xs text-left">
+                                    <thead>
+                                      <tr className="bg-muted/50 border-b text-muted-foreground font-semibold">
+                                        <th className="p-2">Subject</th>
+                                        <th className="p-2 text-center">Total</th>
+                                        <th className="p-2 text-center">Obtained</th>
+                                        <th className="p-2 text-center">Grade</th>
+                                        <th className="p-2 text-center">Status</th>
+                                        <th className="p-2">Remarks</th>
                                       </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
+                                    </thead>
+                                    <tbody>
+                                      {(termDetails.subjects || []).map((subj, idx) => (
+                                        <tr key={idx} className="border-b last:border-b-0 hover:bg-muted/5 transition-colors">
+                                          <td className="p-2 font-medium">{subj.subjectName}</td>
+                                          <td className="p-2 text-center">{subj.totalMarks}</td>
+                                          <td className="p-2 text-center font-semibold text-foreground">{subj.obtainedMarks}</td>
+                                          <td className="p-2 text-center">
+                                            <span className="px-1.5 py-0.5 rounded font-mono text-[10px] bg-muted font-bold">
+                                              {subj.grade || "—"}
+                                            </span>
+                                          </td>
+                                          <td className="p-2 text-center">
+                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${subj.status?.toLowerCase() === "pass" ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
+                                              {subj.status || "—"}
+                                            </span>
+                                          </td>
+                                          <td className="p-2 text-muted-foreground truncate max-w-[120px]" title={subj.remarks}>
+                                            {subj.remarks || "—"}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </CardContent>
                       </Card>
                     ))}
