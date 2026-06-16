@@ -7,6 +7,13 @@ import {
   useUpdateFeeMutation,
   useDeleteFeeMutation,
 } from "@/services/private/feeService";
+import {
+  useGetStudentHistoryQuery,
+  useCreateResultMutation,
+  useUpdateResultMutation,
+  useDeleteResultMutation,
+  useDeleteTermResultMutation,
+} from "@/services/private/resultService";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -75,6 +82,19 @@ export default function StudentDetailsPage() {
   const [isPayOpen, setIsPayOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
+  // Result State Modals & Selection
+  const [selectedResultRecord, setSelectedResultRecord] = useState(null);
+  const [selectedTermName, setSelectedTermName] = useState(null);
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [resultForm, setResultForm] = useState({
+    academicYear: "2026-2027",
+    rollNo: "",
+    promotionStatus: "Pending",
+    termName: "First Term",
+    remarks: "",
+    subjects: [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+  });
+
   // Form states for Add Month Fee
   const [addForm, setAddForm] = useState({
     month: "",
@@ -110,6 +130,164 @@ export default function StudentDetailsPage() {
   const [createFee, { isLoading: isCreatingFee }] = useCreateFeeMutation();
   const [updateFee, { isLoading: isUpdatingFee }] = useUpdateFeeMutation();
   const [deleteFee, { isLoading: isDeletingFee }] = useDeleteFeeMutation();
+
+  // Result API mutations & query
+  const {
+    data: resultsHistoryResponse,
+    isLoading: isResultsLoading,
+    error: resultsError,
+  } = useGetStudentHistoryQuery(id, { skip: !id });
+  const resultsHistory = resultsHistoryResponse?.data || [];
+
+  const [createResult, { isLoading: isCreatingResult }] = useCreateResultMutation();
+  const [updateResult, { isLoading: isUpdatingResult }] = useUpdateResultMutation();
+  const [deleteResult, { isLoading: isDeletingResult }] = useDeleteResultMutation();
+  const [deleteTermResult, { isLoading: isDeletingTerm }] = useDeleteTermResultMutation();
+
+  const handleOpenAddResult = () => {
+    setSelectedResultRecord(null);
+    setSelectedTermName(null);
+    setResultForm({
+      academicYear: "2026-2027",
+      rollNo: student?.rollNo || "",
+      promotionStatus: "Pending",
+      termName: "First Term",
+      remarks: "",
+      subjects: [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+    });
+    setIsResultOpen(true);
+  };
+
+  const handleOpenAddTerm = (record) => {
+    setSelectedResultRecord(record);
+    setSelectedTermName(null);
+    const configuredTerms = Object.keys(record.terms || {});
+    const possibleTerms = ["First Term", "Mid Term", "Final Term"];
+    const remainingTerms = possibleTerms.filter(t => !configuredTerms.includes(t));
+    
+    setResultForm({
+      academicYear: record.academicYear,
+      rollNo: record.rollNo || student?.rollNo || "",
+      promotionStatus: record.promotionStatus || "Pending",
+      termName: remainingTerms[0] || "First Term",
+      remarks: "",
+      subjects: [{ subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+    });
+    setIsResultOpen(true);
+  };
+
+  const handleOpenEditResult = (record, termName) => {
+    setSelectedResultRecord(record);
+    setSelectedTermName(termName);
+    const termData = record.terms[termName];
+    setResultForm({
+      academicYear: record.academicYear,
+      rollNo: record.rollNo || student?.rollNo || "",
+      promotionStatus: record.promotionStatus || "Pending",
+      termName: termName,
+      remarks: termData.remarks || "",
+      subjects: (termData.subjects || []).map(s => ({
+        subjectName: s.subjectName,
+        totalMarks: s.totalMarks ?? 100,
+        obtainedMarks: s.obtainedMarks ?? "",
+        remarks: s.remarks || "",
+      })),
+    });
+    setIsResultOpen(true);
+  };
+
+  const handleSaveResult = async (e) => {
+    e.preventDefault();
+    if (!resultForm.academicYear) {
+      toast.error("Academic Year is required");
+      return;
+    }
+    if (resultForm.subjects.some(s => !s.subjectName || s.obtainedMarks === "")) {
+      toast.error("All subjects must have a name and obtained marks");
+      return;
+    }
+
+    const payload = {
+      academicYear: resultForm.academicYear,
+      rollNo: resultForm.rollNo,
+      promotionStatus: resultForm.promotionStatus,
+      terms: {
+        [resultForm.termName]: {
+          remarks: resultForm.remarks,
+          subjects: resultForm.subjects.map(s => ({
+            subjectName: s.subjectName,
+            totalMarks: Number(s.totalMarks),
+            obtainedMarks: Number(s.obtainedMarks),
+            remarks: s.remarks || "",
+          })),
+        },
+      },
+    };
+
+    try {
+      if (selectedResultRecord) {
+        await updateResult({
+          id: selectedResultRecord.id,
+          body: payload,
+          studentId: id,
+        }).unwrap();
+        toast.success("Result record updated successfully!");
+      } else {
+        await createResult({
+          studentId: id,
+          class: student.class,
+          section: student.section,
+          ...payload,
+        }).unwrap();
+        toast.success("Result record created successfully!");
+      }
+      setIsResultOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to save result record");
+    }
+  };
+
+  const handleDeleteResult = async (recordId) => {
+    if (!window.confirm("Are you sure you want to delete this entire academic record? This will delete all terms.")) {
+      return;
+    }
+    try {
+      await deleteResult({ id: recordId, studentId: id }).unwrap();
+      toast.success("Academic record deleted successfully!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete academic record");
+    }
+  };
+
+  const handleDeleteTerm = async (recordId, termName) => {
+    if (!window.confirm(`Are you sure you want to delete the results for ${termName}?`)) {
+      return;
+    }
+    try {
+      await deleteTermResult({ id: recordId, termName }).unwrap();
+      toast.success(`${termName} result deleted successfully!`);
+    } catch (err) {
+      toast.error(err?.data?.message || `Failed to delete ${termName} result`);
+    }
+  };
+
+  const handleSubjectChange = (index, field, val) => {
+    const newSubjects = [...resultForm.subjects];
+    newSubjects[index] = { ...newSubjects[index], [field]: val };
+    setResultForm({ ...resultForm, subjects: newSubjects });
+  };
+
+  const handleAddSubjectField = () => {
+    setResultForm({
+      ...resultForm,
+      subjects: [...resultForm.subjects, { subjectName: "", totalMarks: 100, obtainedMarks: "", remarks: "" }],
+    });
+  };
+
+  const handleRemoveSubjectField = (index) => {
+    const newSubjects = resultForm.subjects.filter((_, idx) => idx !== index);
+    setResultForm({ ...resultForm, subjects: newSubjects });
+  };
 
   const handleOpenEdit = (fee) => {
     setSelectedFee(fee);
@@ -642,19 +820,186 @@ export default function StudentDetailsPage() {
             </Card>
 
             <Card className="shadow-card md:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary" /> Term Exam Results
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
-                  <GraduationCap className="h-12 w-12 text-muted-foreground/30 mb-2" />
-                  <h4 className="font-semibold text-foreground">No Current Term Results</h4>
-                  <p className="text-xs max-w-xs mt-1">
-                    Academic records for this class session are pending final review and publishes.
+              <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
+                <div>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" /> Academic History & Term Results
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Record term scores and view academic development.
                   </p>
                 </div>
+                <Button
+                  size="sm"
+                  onClick={handleOpenAddResult}
+                  className="gap-1.5 gradient-primary text-primary-foreground border-0 shadow-glow"
+                >
+                  <Plus className="h-4 w-4" /> Add Result Record
+                </Button>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                {isResultsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary animate-pulse" />
+                    <p className="text-xs text-muted-foreground font-semibold">
+                      Loading academic records...
+                    </p>
+                  </div>
+                ) : resultsError ? (
+                  <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-xl flex items-center gap-3 text-destructive">
+                    <AlertCircle className="h-5 w-5 animate-pulse" />
+                    <div className="text-xs">
+                      <p className="font-bold">Failed to load academic records</p>
+                      <p className="opacity-90">
+                        {resultsError?.data?.message || "Verify your connection or server status."}
+                      </p>
+                    </div>
+                  </div>
+                ) : resultsHistory.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
+                    <GraduationCap className="h-12 w-12 text-muted-foreground/30 mb-2" />
+                    <h4 className="font-semibold text-foreground">No Current Term Results</h4>
+                    <p className="text-xs max-w-xs mt-1 mb-4">
+                      Academic records for this class session are pending final review and publishes.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {resultsHistory.map((record) => (
+                      <Card
+                        key={record.id}
+                        className="border bg-card shadow-sm hover:shadow transition-smooth overflow-hidden"
+                      >
+                        <CardHeader className="bg-muted/40 p-4 border-b flex flex-row items-center justify-between">
+                          <div>
+                            <h4 className="font-bold text-sm text-foreground">
+                              Class {record.class} ({record.academicYear})
+                            </h4>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              Section {record.section} · Roll No: #{record.rollNo || "N/A"}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                              {record.promotionStatus || "Pending"}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 px-2 text-xs"
+                              onClick={() => handleOpenAddTerm(record)}
+                              disabled={Object.keys(record.terms || {}).length >= 3}
+                            >
+                              <Plus className="h-3 w-3 mr-1" /> Add Term
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteResult(record.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-4 space-y-6">
+                          {Object.entries(record.terms || {}).map(([termName, termDetails]) => (
+                            <div key={termName} className="space-y-3 border-b last:border-b-0 pb-4 last:pb-0">
+                              <div className="flex items-center justify-between">
+                                <h5 className="font-bold text-xs text-primary">{termName}</h5>
+                                <div className="flex gap-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 w-7 p-0"
+                                    onClick={() => handleOpenEditResult(record, termName)}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
+                                    onClick={() => handleDeleteTerm(record.id, termName)}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-muted/30 p-3 rounded-lg text-xs">
+                                <div>
+                                  <span className="text-muted-foreground">Grade:</span>{" "}
+                                  <span className="font-bold text-foreground">
+                                    {termDetails.grade || "—"} ({termDetails.percentage ? `${termDetails.percentage}%` : "—"})
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">GPA:</span>{" "}
+                                  <span className="font-bold text-foreground">
+                                    {termDetails.gpa ?? "—"}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Position:</span>{" "}
+                                  <span className="font-bold text-foreground">
+                                    {termDetails.position ?? "—"}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Status:</span>{" "}
+                                  <span className="font-bold text-foreground">
+                                    {termDetails.resultStatus || "—"}
+                                  </span>
+                                </div>
+                              </div>
+                              {termDetails.remarks && (
+                                <p className="text-[11px] italic text-muted-foreground px-1">
+                                  <strong>Remarks:</strong> {termDetails.remarks}
+                                </p>
+                              )}
+                              <div className="rounded-lg border overflow-hidden">
+                                <table className="w-full text-xs text-left">
+                                  <thead>
+                                    <tr className="bg-muted/50 border-b text-muted-foreground font-semibold">
+                                      <th className="p-2">Subject</th>
+                                      <th className="p-2 text-center">Total</th>
+                                      <th className="p-2 text-center">Obtained</th>
+                                      <th className="p-2 text-center">Grade</th>
+                                      <th className="p-2 text-center">Status</th>
+                                      <th className="p-2">Remarks</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(termDetails.subjects || []).map((subj, idx) => (
+                                      <tr key={idx} className="border-b last:border-b-0 hover:bg-muted/5 transition-colors">
+                                        <td className="p-2 font-medium">{subj.subjectName}</td>
+                                        <td className="p-2 text-center">{subj.totalMarks}</td>
+                                        <td className="p-2 text-center font-semibold text-foreground">{subj.obtainedMarks}</td>
+                                        <td className="p-2 text-center">
+                                          <span className="px-1.5 py-0.5 rounded font-mono text-[10px] bg-muted font-bold">
+                                            {subj.grade || "—"}
+                                          </span>
+                                        </td>
+                                        <td className="p-2 text-center">
+                                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${subj.status?.toLowerCase() === "pass" ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}`}>
+                                            {subj.status || "—"}
+                                          </span>
+                                        </td>
+                                        <td className="p-2 text-muted-foreground truncate max-w-[120px]" title={subj.remarks}>
+                                          {subj.remarks || "—"}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -980,6 +1325,185 @@ export default function StudentDetailsPage() {
               >
                 {isCreatingFee ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Add Configuration
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add / Edit Result Dialog */}
+      <Dialog open={isResultOpen} onOpenChange={setIsResultOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" />
+              {selectedResultRecord
+                ? selectedTermName
+                  ? `Edit ${selectedTermName} Results`
+                  : `Add Term Results for Class ${selectedResultRecord.class} (${selectedResultRecord.academicYear})`
+                : "Add New Academic Result"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveResult} className="space-y-4 py-2">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="res-academic-year">Academic Year</Label>
+                <Input
+                  id="res-academic-year"
+                  value={resultForm.academicYear}
+                  onChange={(e) => setResultForm({ ...resultForm, academicYear: e.target.value })}
+                  placeholder="e.g. 2026-2027"
+                  required
+                  disabled={!!selectedResultRecord}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="res-term">Term Name</Label>
+                <select
+                  id="res-term"
+                  value={resultForm.termName}
+                  onChange={(e) => setResultForm({ ...resultForm, termName: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  required
+                  disabled={!!selectedTermName}
+                >
+                  <option value="First Term">First Term</option>
+                  <option value="Mid Term">Mid Term</option>
+                  <option value="Final Term">Final Term</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="res-rollno">Roll No (for result record)</Label>
+                <Input
+                  id="res-rollno"
+                  value={resultForm.rollNo}
+                  onChange={(e) => setResultForm({ ...resultForm, rollNo: e.target.value })}
+                  placeholder="e.g. 12"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="res-promotion">Promotion Status</Label>
+                <select
+                  id="res-promotion"
+                  value={resultForm.promotionStatus}
+                  onChange={(e) => setResultForm({ ...resultForm, promotionStatus: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  required
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Promoted">Promoted</option>
+                  <option value="Demoted">Demoted</option>
+                  <option value="Passed">Passed</option>
+                  <option value="Failed">Failed</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="res-remarks">Overall Term Remarks</Label>
+              <Textarea
+                id="res-remarks"
+                value={resultForm.remarks}
+                onChange={(e) => setResultForm({ ...resultForm, remarks: e.target.value })}
+                placeholder="Overall performance evaluation"
+                rows={2}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b pb-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Subjects & Marks</h4>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAddSubjectField}
+                  className="h-8 text-xs gap-1"
+                >
+                  <Plus className="h-3 w-3" /> Add Subject
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {resultForm.subjects.map((subj, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row gap-2 border p-3 rounded-lg bg-muted/20 relative group">
+                    <div className="flex-1 space-y-1.5">
+                      <Label className="text-[10px] text-muted-foreground">Subject Name</Label>
+                      <Input
+                        value={subj.subjectName}
+                        onChange={(e) => handleSubjectChange(index, "subjectName", e.target.value)}
+                        placeholder="e.g. Mathematics"
+                        required
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="w-24 space-y-1.5">
+                      <Label className="text-[10px] text-muted-foreground">Total Marks</Label>
+                      <Input
+                        type="number"
+                        value={subj.totalMarks}
+                        onChange={(e) => handleSubjectChange(index, "totalMarks", e.target.value)}
+                        required
+                        className="h-8 text-xs"
+                        min="1"
+                      />
+                    </div>
+                    <div className="w-28 space-y-1.5">
+                      <Label className="text-[10px] text-muted-foreground">Obtained Marks</Label>
+                      <Input
+                        type="number"
+                        value={subj.obtainedMarks}
+                        onChange={(e) => handleSubjectChange(index, "obtainedMarks", e.target.value)}
+                        required
+                        className="h-8 text-xs"
+                        min="0"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1.5">
+                      <Label className="text-[10px] text-muted-foreground">Remarks / Grade (Optional)</Label>
+                      <Input
+                        value={subj.remarks}
+                        onChange={(e) => handleSubjectChange(index, "remarks", e.target.value)}
+                        placeholder="e.g. A+"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    {resultForm.subjects.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveSubjectField(index)}
+                        className="h-8 w-8 text-destructive hover:bg-destructive/10 self-end"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0 mt-4 border-t pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsResultOpen(false)}
+                disabled={isCreatingResult || isUpdatingResult}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="gradient-primary text-primary-foreground border-0 font-semibold"
+                disabled={isCreatingResult || isUpdatingResult}
+              >
+                {(isCreatingResult || isUpdatingResult) && (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                )}
+                Save Results
               </Button>
             </DialogFooter>
           </form>
