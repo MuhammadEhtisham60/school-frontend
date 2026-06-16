@@ -503,7 +503,7 @@ export default function StudentDetailsPage() {
                           const nextMonth = availableMonths[0] || "";
                           setAddForm({
                             month: nextMonth,
-                            amount: "",
+                            amount: student?.classFees || student?.class_fees || "",
                             paymentDate: new Date().toISOString().split("T")[0],
                             paymentMethod: "Cash",
                             status: "Paid",

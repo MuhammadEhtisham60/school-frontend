@@ -84,6 +84,7 @@ function AdmissionPage() {
       cnic: student.cnic || "",
       photo: null,
       class: student.class || "",
+      class_fees: student.classFees !== undefined ? student.classFees : student.class_fees || "",
       section: student.section || "",
       prevSchool: student.prevSchool || "",
       lastResult: student.lastResult || "",
