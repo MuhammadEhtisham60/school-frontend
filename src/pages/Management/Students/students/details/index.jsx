@@ -306,7 +306,7 @@ export default function StudentDetailsPage() {
           <div className="text-center md:text-left flex-1 space-y-2">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <h1 className="text-2xl font-black tracking-tight">{student.fullName}</h1>
-              <StatusBadge status={student.status || "Active"} />
+              <StatusBadge status={student.is_active ? "Active" : "Inactive"} />
               <StatusBadge status={student.feeStatus || "Paid"} />
             </div>
             <p className="text-sm font-semibold text-primary flex items-center justify-center md:justify-start gap-1">

@@ -32,6 +32,7 @@ export const initialValues = {
   transport: false,
   busRoute: "",
   hostel: false,
+  is_active: true,
   studentPhoto: null,
   bFormCopy: null,
   prevResultCard: null,

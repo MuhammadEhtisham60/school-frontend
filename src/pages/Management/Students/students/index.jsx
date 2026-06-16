@@ -76,7 +76,7 @@ function StudentsPage() {
   const studentsList = data?.students || [];
 
   const total = studentsList.length;
-  const active = studentsList.filter((s) => (s.status || "Active") === "Active").length;
+  const active = studentsList.filter((s) => s.is_active).length;
   const fees = studentsList.filter((s) => (s.feeStatus || "Paid") === "Paid").length;
 
   const triggerDelete = (id, name) => {
@@ -220,7 +220,7 @@ function StudentsPage() {
                     <StatusBadge status={s.feeStatus || "Paid"} />
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={s.status || "Active"} />
+                    <StatusBadge status={s.is_active ? "Active" : "Inactive"} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">

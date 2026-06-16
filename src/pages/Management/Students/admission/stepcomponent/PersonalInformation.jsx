@@ -4,6 +4,7 @@ import {
   FormikDatePicker,
   FormikRadio,
   FormikFile,
+  FormikCheckBox,
 } from "@/components/common/sharedfields";
 
 export function PersonalInformation() {
@@ -16,6 +17,13 @@ export function PersonalInformation() {
       <FormikRadio name="gender" label="Gender" required options={["Male", "Female", "Other"]} />
       <FormikText name="cnic" label="B-Form / CNIC" placeholder="12345-1234567-1" />
       <FormikFile name="photo" label="Profile Photo" />
+      <FormikCheckBox
+        name="is_active"
+        label="Active Status"
+        description="Toggle to activate or deactivate the student profile"
+        variant="switch"
+        full
+      />
     </Section>
   );
 }

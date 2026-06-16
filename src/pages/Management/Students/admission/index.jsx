@@ -107,6 +107,7 @@ function AdmissionPage() {
       transport: student.transport || false,
       busRoute: student.busRoute || "",
       hostel: student.hostel || false,
+      is_active: student.is_active !== undefined ? student.is_active : (student.isActive !== undefined ? student.isActive : true),
       studentPhoto: null,
       bFormCopy: null,
       prevResultCard: null,
