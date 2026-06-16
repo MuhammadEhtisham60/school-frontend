@@ -13,7 +13,7 @@ import {
   UsersPage,
   RoleUsersPage,
 } from "@/pages/Management/Employees";
-import { ClassRoutinePage, SubjectsPage, ExamPage, ResultPage, ClassesPage } from "@/pages/Management/Academics";
+import { ClassRoutinePage, SubjectsPage, ExamPage, ResultPage, ClassesPage, ClassDetailsPage } from "@/pages/Management/Academics";
 import {
   FileManagerPage,
   LibraryPage,
@@ -69,6 +69,10 @@ export const privateRoutes = [
       {
         path: "/classes",
         element: <ClassesPage />,
+      },
+      {
+        path: "/classes/:id",
+        element: <ClassDetailsPage />,
       },
       {
         path: "/subjects",

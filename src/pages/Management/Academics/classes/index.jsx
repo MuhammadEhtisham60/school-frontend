@@ -40,6 +40,7 @@ import {
   Trash2,
   X,
   BookOpenCheck,
+  Eye,
 } from "lucide-react";
 import {
   useGetClassesQuery,
@@ -364,7 +365,7 @@ function ClassesPage() {
                       {/* Class Name */}
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                          <BookOpen className="h-5 w-5 text-primary" /> Class {c.name}
+                          <BookOpen className="h-5 w-5 text-primary" />{c.name}
                         </h3>
                         <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                           Order: {c.displayOrder}
@@ -418,6 +419,15 @@ function ClassesPage() {
                       </div>
 
                       <div className="flex items-center justify-end gap-1.5 pt-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          onClick={() => navigate(`/classes/${c.id}`)}
+                          title="View Class details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
