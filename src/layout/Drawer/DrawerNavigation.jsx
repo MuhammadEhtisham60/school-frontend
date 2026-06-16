@@ -5,6 +5,7 @@ import { logout } from "@/store/slices/authSlice";
 import { Sidebar, useSidebar } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
+  Layers,
   GraduationCap,
   UserPlus,
   Users,
@@ -43,6 +44,7 @@ const mainItems = [
 ];
 
 const academicItems = [
+  { title: "Classes", url: "/classes", icon: Layers },
   { title: "Subjects", url: "/subjects", icon: BookOpenCheck },
   { title: "Class Routine", url: "/class-routine", icon: Clock },
   { title: "Exam", url: "/exam", icon: FileText },

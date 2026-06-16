@@ -52,6 +52,7 @@ import {
   useDeleteTermResultMutation,
 } from "@/services/private/resultService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
+import { useGetClassesDropdownQuery } from "@/services/private/classService";
 
 const ACADEMIC_YEARS = ["2023-2024", "2024-2025", "2025-2026", "2026-2027"];
 const TERMS = ["First Term", "Mid Term", "Final Term"];
@@ -100,6 +101,9 @@ function ResultPage() {
 
   const { data: studentsResponse } = useGetStudentsQuery({ limit: 1000 });
   const studentsList = studentsResponse?.students || [];
+
+  const { data: classesResponse } = useGetClassesDropdownQuery();
+  const classesList = classesResponse?.data || [];
 
   // Mutations
   const [createResult, { isLoading: isCreating }] = useCreateResultMutation();
@@ -554,9 +558,9 @@ function ResultPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((c) => (
-                  <SelectItem key={c} value={c}>
-                    Class {c}
+                {classesList.map((c) => (
+                  <SelectItem key={c._id} value={c.name}>
+                    Class {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>

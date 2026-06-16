@@ -1,30 +1,24 @@
 import { Section } from "./Section";
 import { FormikSelect, FormikText, FormikDatePicker } from "@/components/common/sharedfields";
+import { useGetClassesDropdownQuery } from "@/services/private/classService";
 
 export function AcademicInformation() {
+  const { data: classesResponse, isLoading, error } = useGetClassesDropdownQuery();
+
+  const classOptions = classesResponse?.data?.map((c) => ({
+    value: c.name,
+    label: `Class ${c.name}`,
+  })) || [];
+
   return (
     <Section title="Academic Information" desc="Class assignment and academic history">
       <FormikSelect
         name="class"
         label="Admission Class"
-        placeholder="Select class"
+        placeholder={isLoading ? "Loading classes..." : "Select class"}
         required
-        options={[
-          "Nursery",
-          "KG",
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-        ].map((c) => ({ value: c, label: `Class ${c}` }))}
+        disabled={isLoading || !!error}
+        options={classOptions}
       />
       <FormikSelect
         name="section"

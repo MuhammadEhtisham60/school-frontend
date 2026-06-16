@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
 import { ListToolbar, StatusBadge } from "@/components/shared/ListToolbar";
 import { Card } from "@/components/ui/card";
@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useGetStudentsQuery, useDeleteStudentMutation } from "@/services/private/studentService";
+import { useGetClassesDropdownQuery } from "@/services/private/classService";
 import { Pencil, Trash2, Eye, GraduationCap, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { StatCard } from "@/components/ui/stat-card";
@@ -56,9 +57,23 @@ const getInitials = (name) => {
 
 function StudentsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const initialClass = queryParams.get("class") || "all";
+
   const [search, setSearch] = useState("");
-  const [classFilter, setClassFilter] = useState("all");
+  const [classFilter, setClassFilter] = useState(initialClass);
   const [sectionFilter, setSectionFilter] = useState("all");
+
+  useEffect(() => {
+    const classParam = queryParams.get("class");
+    if (classParam) {
+      setClassFilter(classParam);
+    }
+  }, [queryParams]);
+
+  const { data: classesResponse } = useGetClassesDropdownQuery();
+  const classesList = classesResponse?.data || [];
 
   // Delete States
   const [deleteId, setDeleteId] = useState(null);
@@ -132,9 +147,9 @@ function StudentsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Classes</SelectItem>
-              {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((c) => (
-                <SelectItem key={c} value={c}>
-                  Class {c}
+              {classesList.map((c) => (
+                <SelectItem key={c._id} value={c.name}>
+                  Class {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
