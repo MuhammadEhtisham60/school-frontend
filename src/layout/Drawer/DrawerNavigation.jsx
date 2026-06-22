@@ -37,47 +37,47 @@ const mainItems = [
   { title: "Dashboard", url: "/backoffice", icon: LayoutDashboard },
   { title: "Admissions", url: "/admission", icon: UserPlus },
   { title: "Students", url: "/students", icon: GraduationCap },
-  { title: "Teachers", url: "/teachers", icon: BookOpen },
-  { title: "Admins", url: "/admins", icon: ShieldCheck },
-  { title: "User Management", url: "/users", icon: Users },
-  { title: "Role Based Users", url: "/role-users", icon: UserCog },
+  // { title: "Teachers", url: "/teachers", icon: BookOpen },
+  // { title: "Admins", url: "/admins", icon: ShieldCheck },
+  // { title: "User Management", url: "/users", icon: Users },
+  // { title: "Role Based Users", url: "/role-users", icon: UserCog },
 ];
 
 const academicItems = [
   { title: "Classes", url: "/classes", icon: Layers },
-  { title: "Subjects", url: "/subjects", icon: BookOpenCheck },
-  { title: "Class Routine", url: "/class-routine", icon: Clock },
-  { title: "Exam", url: "/exam", icon: FileText },
-  { title: "Result", url: "/result", icon: Award },
-  { title: "Library", url: "/library", icon: Library },
+  // { title: "Subjects", url: "/subjects", icon: BookOpenCheck },
+  // { title: "Class Routine", url: "/class-routine", icon: Clock },
+  // { title: "Exam", url: "/exam", icon: FileText },
+  // { title: "Result", url: "/result", icon: Award },
+  // { title: "Library", url: "/library", icon: Library },
 ];
 
-const operationItems = [
-  { title: "Attendance", url: "/attendance", icon: CalendarCheck },
-  { title: "Fees", url: "/fees", icon: Wallet },
-  { title: "Accountant", url: "/accountant", icon: Calculator },
-  { title: "Notice", url: "/notice", icon: Bell },
-  { title: "Event Calendar", url: "/event-calendar", icon: CalendarDays },
-  { title: "Reports", url: "/reports", icon: BarChart3 },
-];
+// const operationItems = [
+//   { title: "Attendance", url: "/attendance", icon: CalendarCheck },
+//   { title: "Fees", url: "/fees", icon: Wallet },
+//   { title: "Accountant", url: "/accountant", icon: Calculator },
+//   { title: "Notice", url: "/notice", icon: Bell },
+//   { title: "Event Calendar", url: "/event-calendar", icon: CalendarDays },
+//   { title: "Reports", url: "/reports", icon: BarChart3 },
+// ];
 
-const resourceItems = [
-  { title: "File Manager", url: "/file-manager", icon: FolderOpen },
-  { title: "Paper Collection", url: "/paper-collection", icon: FileStack },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
+// const resourceItems = [
+//   { title: "File Manager", url: "/file-manager", icon: FolderOpen },
+//   { title: "Paper Collection", url: "/paper-collection", icon: FileStack },
+//   { title: "Settings", url: "/settings", icon: Settings },
+// ];
 
-const websiteItems = [
-  { title: "Site Manage", url: "/site-manage", icon: Globe },
-  { title: "Visit Website", url: "/site", icon: School },
-];
+// const websiteItems = [
+//   { title: "Site Manage", url: "/site-manage", icon: Globe },
+//   { title: "Visit Website", url: "/site", icon: School },
+// ];
 
 const sections = [
   { label: "Main", items: mainItems },
   { label: "Academics", items: academicItems },
-  { label: "Operations", items: operationItems },
-  { label: "Resources", items: resourceItems },
-  { label: "Website", items: websiteItems },
+  // { label: "Operations", items: operationItems },
+  // { label: "Resources", items: resourceItems },
+  // { label: "Website", items: websiteItems },
 ];
 
 export function DrawerNavigation() {
