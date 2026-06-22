@@ -8,6 +8,7 @@ import ThemeCustomization from "@/themes";
 import Locales from "@/components/Locales";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import AuthInitializer from "@/components/AuthInitializer";
+import ErrorBoundary from "@/pages/maintenance/ErrorBoundary";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,9 @@ export default function App() {
         >
           <ThemeCustomization>
             <Locales>
-              <RouterProvider router={router} />
+              <ErrorBoundary>
+                <RouterProvider router={router} />
+              </ErrorBoundary>
             </Locales>
           </ThemeCustomization>
         </SnackbarProvider>

@@ -97,7 +97,6 @@ function ClassesPage() {
     if (cleanName === "nursery" || cleanName === "kg") {
       return {
         type: "Early Childhood Education",
-        desc: "Foundation-level pre-school curriculum focusing on developmental milestones and basic cognitive skills.",
         color: "from-pink-500/10 to-rose-500/10 text-pink-600 dark:text-pink-400",
       };
     }
@@ -106,35 +105,30 @@ function ClassesPage() {
       if (num >= 1 && num <= 5) {
         return {
           type: "Primary Education",
-          desc: `Elementary curriculum for class ${name} focusing on core numeracy, literacy, and introductory sciences.`,
           color: "from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400",
         };
       }
       if (num >= 6 && num <= 8) {
         return {
           type: "Middle School",
-          desc: `Middle school program for class ${name} bridging elementary learning with advanced secondary studies.`,
           color: "from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400",
         };
       }
       if (num >= 9 && num <= 10) {
         return {
           type: "High School (Matriculation)",
-          desc: `Secondary matriculation board prep class ${name} with focus on elective majors (Science/Arts/Commerce).`,
           color: "from-blue-500/10 to-indigo-500/10 text-blue-600 dark:text-blue-400",
         };
       }
       if (num >= 11 && num <= 12) {
         return {
           type: "Higher Secondary (Intermediate)",
-          desc: `Intermediate pre-university class ${name} specializing in Pre-Medical, Pre-Engineering, or Humanities.`,
           color: "from-violet-500/10 to-fuchsia-500/10 text-violet-600 dark:text-violet-400",
         };
       }
     }
     return {
       type: "General Academics",
-      desc: `Academic level curriculum for class ${name} aligned with national education board standards.`,
       color: "from-blue-500/10 to-violet-500/10 text-blue-600 dark:text-blue-400",
     };
   };
@@ -372,14 +366,9 @@ function ClassesPage() {
                         </span>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                        {details.desc}
-                      </p>
-
                       {/* Associated Subjects */}
                       <div className="mb-6 space-y-1.5">
-                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider flex items-center gap-1">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider flex items-center gap-1 mb-2">
                           <BookOpenCheck className="h-3 w-3 text-muted-foreground" /> Assigned Subjects ({c.subjects?.length || 0})
                         </p>
                         <div className="flex flex-wrap gap-1">
