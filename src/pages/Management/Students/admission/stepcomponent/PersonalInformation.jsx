@@ -14,13 +14,14 @@ export function PersonalInformation() {
       <FormikText name="fatherName" label="Father's Name" placeholder="e.g. Ahmed Khan" required />
       <FormikDatePicker name="dob" label="Date of Birth" required />
       <FormikRadio name="gender" label="Gender" required options={["Male", "Female", "Other"]} />
-      <FormikText name="cnic" label="B-Form / CNIC" placeholder="12345-1234567-1" />
-      <FormikFile name="photo" label="Profile Photo" />
+      <FormikText name="cnic" label="B-Form / CNIC" placeholder="12345-1234567-1" required />
+      <FormikFile name="photo" label="Profile Photo" required />
       <FormikCheckBox
         name="is_active"
         label="Active Status"
         description="Toggle to activate or deactivate the student profile"
         variant="switch"
+        required
         full
       />
     </Section>

@@ -27,12 +27,13 @@ export function AcademicInformation() {
         required
         options={["A", "B", "C", "D"].map((s) => ({ value: s, label: `Section ${s}` }))}
       />
-      <FormikText name="rollNo" label="Roll Number" placeholder="Auto / Manual" />
+      <FormikText name="rollNo" label="Roll Number" placeholder="Auto / Manual" required />
       <FormikText
         name="class_fees"
         type="number"
         label="Monthly Class Fees (Rs.)"
         placeholder="e.g. 5000"
+        required
       />
       <FormikText name="prevSchool" label="Previous School" placeholder="School name" />
       <FormikText

@@ -29,7 +29,7 @@ import {
   Sparkles,
   Loader2,
 } from "lucide-react";
-import { initialValues, validationSchema } from "./util/helpers";
+import { initialValues, validationSchema, getTodayDateString } from "./util/helpers";
 import {
   PersonalInformation,
   AcademicInformation,
@@ -88,7 +88,7 @@ function AdmissionPage() {
       section: student.section || "",
       prevSchool: student.prevSchool || "",
       lastResult: student.lastResult || "",
-      admissionDate: student.admissionDate || "",
+      admissionDate: student.admissionDate || getTodayDateString(),
       mobile: student.mobile || "",
       altContact: student.altContact || "",
       email: student.email || "",
@@ -160,6 +160,72 @@ function AdmissionPage() {
           toast.success("Saved as draft", { description: "You can resume anytime." });
         };
 
+        const stepFields = {
+          1: ["fullName", "fatherName", "dob", "gender", "cnic", "photo", "is_active"],
+          2: ["class", "section", "rollNo", "class_fees", "prevSchool", "lastResult", "admissionDate"],
+          3: ["mobile", "altContact", "email", "city", "address"],
+          4: ["fatherFullName", "fatherCNIC", "occupation", "fatherPhone", "motherName", "motherPhone"],
+          5: ["blood", "emergency", "medical", "disability"],
+          6: ["transport", "busRoute", "hostel"],
+          7: ["studentPhoto", "bFormCopy", "prevResultCard", "guardianCnic"],
+        };
+
+        const validateStep = async (stepNum) => {
+          const formErrors = await formikProps.validateForm();
+          const fields = stepFields[stepNum] || [];
+          const stepErrors = {};
+          fields.forEach((field) => {
+            if (formErrors[field]) {
+              stepErrors[field] = formErrors[field];
+            }
+          });
+          return stepErrors;
+        };
+
+        const handleStepChange = async (targetStep) => {
+          if (targetStep > step) {
+            // Validate all steps from current step up to targetStep - 1
+            for (let sId = step; sId < targetStep; sId++) {
+              const stepErrors = await validateStep(sId);
+              const errorKeys = Object.keys(stepErrors);
+              if (errorKeys.length > 0) {
+                // Mark all fields of the first invalid step as touched so errors are highlighted
+                const fields = stepFields[sId];
+                fields.forEach((field) => {
+                  formikProps.setFieldTouched(field, true, true);
+                });
+                // Go to the first invalid step
+                setStep(sId);
+                toast.error(`Please correct the errors in Step ${sId} (${steps[sId - 1].title}) first.`, {
+                  description: Object.values(stepErrors).join(", "),
+                });
+                return;
+              }
+            }
+          }
+          setStep(targetStep);
+        };
+
+        const handlePreview = async () => {
+          // Validate all steps from 1 to 7
+          for (let sId = 1; sId <= steps.length; sId++) {
+            const stepErrors = await validateStep(sId);
+            const errorKeys = Object.keys(stepErrors);
+            if (errorKeys.length > 0) {
+              const fields = stepFields[sId];
+              fields.forEach((field) => {
+                formikProps.setFieldTouched(field, true, true);
+              });
+              setStep(sId);
+              toast.error(`Please correct the errors in Step ${sId} (${steps[sId - 1].title}) before previewing.`, {
+                description: Object.values(stepErrors).join(", "),
+              });
+              return;
+            }
+          }
+          setPreview(true);
+        };
+
         return (
           <div className="space-y-6">
             <PageHeader
@@ -176,7 +242,7 @@ function AdmissionPage() {
                     Save Draft
                   </CancelButton>
                   <Badge className="gradient-primary border-0 text-primary-foreground gap-1">
-                    <Sparkles className="h-3 w-3" /> Smart Form
+                    <Sparkles className="h-6 w-4" /> Smart Form
                   </Badge>
                 </>
               }
@@ -199,7 +265,7 @@ function AdmissionPage() {
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => setStep(s.id)}
+                      onClick={() => handleStepChange(s.id)}
                       className={cn(
                         "flex flex-col items-center gap-2 p-3 rounded-xl text-center transition-smooth border",
                         active &&
@@ -247,12 +313,12 @@ function AdmissionPage() {
                     Back
                   </CancelButton>
                   {step < steps.length ? (
-                    <PrimaryButton onClick={next} endIcon={<ChevronRight className="h-4 w-4" />}>
+                    <PrimaryButton onClick={() => handleStepChange(step + 1)} endIcon={<ChevronRight className="h-4 w-4" />}>
                       Next Step
                     </PrimaryButton>
                   ) : (
                     <PrimaryButton
-                      onClick={() => setPreview(true)}
+                      onClick={handlePreview}
                       endIcon={<ChevronRight className="h-4 w-4" />}
                     >
                       Preview
