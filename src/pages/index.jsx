@@ -4,7 +4,6 @@ import { LayoutDashboard, Globe, GraduationCap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 function LandingPage() {
-  throw new Error("Test Error: This is a deliberate rendering error to test the custom Error Boundary and Maintenance page.");
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
       <div className="max-w-4xl w-full space-y-12 text-center">

@@ -27,6 +27,7 @@ export function AcademicInformation() {
         required
         options={["A", "B", "C", "D"].map((s) => ({ value: s, label: `Section ${s}` }))}
       />
+      <FormikText name="rollNo" label="Roll Number" placeholder="Auto / Manual" />
       <FormikText
         name="class_fees"
         type="number"
