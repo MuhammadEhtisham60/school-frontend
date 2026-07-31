@@ -67,17 +67,17 @@ const academicItems = [
 //   { title: "Settings", url: "/settings", icon: Settings },
 // ];
 
-// const websiteItems = [
-//   { title: "Site Manage", url: "/site-manage", icon: Globe },
-//   { title: "Visit Website", url: "/site", icon: School },
-// ];
+const websiteItems = [
+  { title: "Site Manage", url: "/site-manage", icon: Globe },
+  { title: "Visit Website", url: "/site", icon: School },
+];
 
 const sections = [
   { label: "Main", items: mainItems },
   { label: "Academics", items: academicItems },
   // { label: "Operations", items: operationItems },
   // { label: "Resources", items: resourceItems },
-  // { label: "Website", items: websiteItems },
+  { label: "Website", items: websiteItems },
 ];
 
 export function DrawerNavigation() {

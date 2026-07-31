@@ -83,6 +83,15 @@ export const studentApi = baseApi.injectEndpoints({
         { type: "Student", id: "LIST" },
       ],
     }),
+    getNextRollNo: builder.query({
+      query: (params) => ({
+        url: "students/next-roll-no",
+        method: "GET",
+        params,
+      }),
+      providesTags: [{ type: "Student", id: "LIST" }],
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
@@ -95,4 +104,5 @@ export const {
   useGetStudentFeesQuery,
   useUpdateStudentFeeMutation,
   usePayStudentFeeMutation,
+  useGetNextRollNoQuery,
 } = studentApi;

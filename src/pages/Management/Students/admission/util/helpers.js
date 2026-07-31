@@ -66,7 +66,7 @@ export const validationSchema = Yup.object().shape({
   // Step 2: Academic
   class: Yup.string().required("Admission class is required"),
   section: Yup.string().required("Section is required"),
-  rollNo: Yup.string().nullable().required("Roll No is required"),
+  rollNo: Yup.string().nullable(),
   class_fees: Yup.number()
     .typeError("Must be a number")
     .required("Class fees is required")

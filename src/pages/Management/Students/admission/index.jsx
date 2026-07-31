@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Formik } from "formik";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
@@ -55,6 +56,8 @@ function AdmissionPage() {
   const { id } = useParams();
   const isEditMode = !!id;
   const [step, setStep] = useState(1);
+  const user = useSelector((state) => state.auth.user);
+  const academicSession = user?.academicSession || "";
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
 
@@ -137,6 +140,8 @@ function AdmissionPage() {
               formData.append(key, value);
             }
           });
+          // Append active academic session
+          formData.append("academicSession", academicSession);
           if (isEditMode) {
             await updateStudent({ id, formData }).unwrap();
             toast.success("Student details updated successfully!");
