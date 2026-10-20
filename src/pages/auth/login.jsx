@@ -1,10 +1,9 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Sparkles, ShieldCheck, Briefcase, UserCheck } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/store/slices/authSlice";
-import { useLoginMutation } from "@/services/public/authService";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { FormikText, FormikCheckBox } from "@/components/common/sharedfields";
@@ -20,57 +19,42 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [login, { isLoading }] = useLoginMutation();
 
-  const handleSubmit = async (values) => {
-    // Demo bypass logic
-    if (values.email.trim() === "admin@admin.com" && values.password === "admin123") {
-      dispatch(
-        setCredentials({
-          token: "demo-admin-token",
-          user: {
-            id: "demo-admin",
-            email: "admin@admin.com",
-            role: "Admin",
-            profile: {
-              name: "Admin User",
-            },
+  const performLogin = (role = "Super Admin", email = "admin@admin.com", name = "Admin User") => {
+    dispatch(
+      setCredentials({
+        token: "demo-token-" + Date.now(),
+        user: {
+          id: "demo-" + role.toLowerCase().replace(/\s+/g, "-"),
+          email,
+          role,
+          profile: {
+            name,
           },
-        }),
-      );
-      apiHandleToaster.success("Welcome back (Demo Admin)!");
-      navigate("/backoffice");
-      return;
-    }
-
-    try {
-      const response = await login({
-        email: values.email,
-        password: values.password,
-      }).unwrap();
-
-      const formattedUser = {
-        ...response.user,
-        role: response.user?.role || "User",
-        profile: {
-          name:
-            `${response.user?.firstName || ""} ${response.user?.lastName || ""}`.trim() ||
-            response.user?.email ||
-            "User",
         },
-      };
+      }),
+    );
+    apiHandleToaster.success(`Welcome back (${role})!`);
+    navigate("/backoffice");
+  };
 
-      dispatch(
-        setCredentials({
-          token: response.token,
-          user: formattedUser,
-        }),
-      );
-      apiHandleToaster.success("Welcome back!");
-      navigate("/backoffice");
-    } catch (err) {
-      apiHandleToaster.error(err, "Invalid email or password");
+  const handleSubmit = (values) => {
+    const rawEmail = (values.email || "").toLowerCase();
+    let role = "Super Admin";
+    let name = "Admin User";
+
+    if (rawEmail.includes("teacher")) {
+      role = "Teacher";
+      name = "Sara Mahmood (Teacher)";
+    } else if (rawEmail.includes("accountant")) {
+      role = "Accountant";
+      name = "Saima Akhtar (Accountant)";
+    } else if (values.email) {
+      name = values.email.split("@")[0].replace(/[._]/g, " ");
+      name = name.charAt(0).toUpperCase() + name.slice(1);
     }
+
+    performLogin(role, values.email || "admin@admin.com", name);
   };
 
   return (
@@ -109,7 +93,7 @@ function LoginPage() {
 
       {/* Right - Login Form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-background p-6 sm:p-12 relative z-10">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-6">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 lg:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary text-primary-foreground">
@@ -119,19 +103,73 @@ function LoginPage() {
           </div>
 
           <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+              <Sparkles className="h-3.5 w-3.5" /> Client Demo Mode Active
+            </div>
             <h2 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Sign in with your registered account or use demo credentials.
+              Instant login enabled — explore the platform with one click.
             </p>
           </div>
 
+          {/* Quick One-Click Demo Login Button */}
+          <Button
+            type="button"
+            onClick={() => performLogin("Super Admin", "admin@admin.com", "Admin User")}
+            className="w-full h-12 text-base font-semibold gradient-hero shadow-glow text-white cursor-pointer hover:opacity-95 transition-all flex items-center justify-center gap-2 rounded-xl"
+          >
+            <Sparkles className="h-5 w-5" /> One-Click Demo Login
+          </Button>
+
+          {/* Role selector chips */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground text-center">
+              Or sign in directly as a specific role:
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => performLogin("Super Admin", "admin@admin.com", "Admin User")}
+                className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-border bg-card hover:bg-accent hover:border-primary/40 transition-colors text-xs font-medium text-center cursor-pointer shadow-sm"
+              >
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                <span>Super Admin</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => performLogin("Teacher", "teacher@admin.com", "Sara Mahmood")}
+                className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-border bg-card hover:bg-accent hover:border-primary/40 transition-colors text-xs font-medium text-center cursor-pointer shadow-sm"
+              >
+                <UserCheck className="h-4 w-4 text-emerald-500" />
+                <span>Teacher</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => performLogin("Accountant", "accountant@admin.com", "Saima Akhtar")}
+                className="flex flex-col items-center gap-1 p-2.5 rounded-lg border border-border bg-card hover:bg-accent hover:border-primary/40 transition-colors text-xs font-medium text-center cursor-pointer shadow-sm"
+              >
+                <Briefcase className="h-4 w-4 text-amber-500" />
+                <span>Accountant</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="relative flex items-center justify-center my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <span className="relative bg-background px-3 text-xs uppercase text-muted-foreground font-medium">
+              or enter credentials
+            </span>
+          </div>
+
           <Formik
-            initialValues={{ email: "", password: "", remember: false }}
+            initialValues={{ email: "admin@admin.com", password: "admin123", remember: true }}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}
           >
             {() => (
-              <Form className="space-y-5">
+              <Form className="space-y-4">
                 <FormikText
                   name="email"
                   label="Email address"
@@ -171,20 +209,16 @@ function LoginPage() {
 
                 <Button
                   type="submit"
-                  disabled={isLoading}
                   className="w-full h-11 gradient-primary shadow-glow text-primary-foreground cursor-pointer"
                 >
-                  {isLoading ? "Signing in..." : "Sign in"}
+                  Sign in
                 </Button>
               </Form>
             )}
           </Formik>
 
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary font-medium hover:underline">
-              Create an account
-            </Link>
+          <p className="text-center text-sm text-muted-foreground mt-3">
+            Demo credentials: <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground">admin@admin.com</code> / <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground">admin123</code>
           </p>
         </div>
       </div>

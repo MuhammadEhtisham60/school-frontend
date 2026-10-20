@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Globe, GraduationCap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 function LandingPage() {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
       <div className="max-w-4xl w-full space-y-12 text-center">
@@ -36,7 +38,7 @@ function LandingPage() {
                 </p>
               </div>
               <Button asChild size="lg" className="w-full gradient-primary text-white shadow-glow">
-                <Link to="/login">Open Dashboard</Link>
+                <Link to={isAuthenticated ? "/backoffice" : "/login"}>Open Dashboard</Link>
               </Button>
             </div>
           </Card>
