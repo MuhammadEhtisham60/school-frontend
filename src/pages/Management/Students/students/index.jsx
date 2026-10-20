@@ -36,14 +36,7 @@ import { Pencil, Trash2, Eye, GraduationCap, Loader2, AlertCircle } from "lucide
 import { toast } from "sonner";
 import { StatCard } from "@/components/ui/stat-card";
 
-const getMediaUrl = (path) => {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  const baseUrl = import.meta.env.VITE_APP_API_URL
-    ? import.meta.env.VITE_APP_API_URL.replace("/api/", "")
-    : "http://localhost:5000";
-  return `${baseUrl}${path}`;
-};
+const getMediaUrl = (path) => path || "";
 
 const getInitials = (name) => {
   if (!name) return "?";

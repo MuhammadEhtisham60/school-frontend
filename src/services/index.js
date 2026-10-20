@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { students as mockStudentsList } from "@/data/mock-data";
 
 // Rich mock data for offline client preview
@@ -54,32 +54,12 @@ const mockProfile = {
   academicSession: "2024-2025",
 };
 
-const rawBaseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_APP_API_URL || "http://localhost:5000/api/",
-  prepareHeaders: (headers) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
-    }
-    return headers;
-  },
-});
-
-// Resilient base query that falls back to realistic mock data when backend is not running
-const dynamicBaseQuery = async (args, api, extraOptions) => {
+// Local mock base query: every request is answered from the mock data above.
+// No network calls are made.
+const mockBaseQuery = async (args) => {
   const url = typeof args === "string" ? args : args.url || "";
   const method = (typeof args === "string" ? "GET" : args.method || "GET").toUpperCase();
 
-  try {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (!result.error) {
-      return result;
-    }
-  } catch {
-    // Backend offline: proceed to mock fallback below
-  }
-
-  // --- MOCK FALLBACK HANDLERS ---
   if (method === "GET") {
     if (url.includes("students/next-roll-no")) {
       return { data: { nextRollNo: "1056" } };
@@ -142,7 +122,7 @@ const dynamicBaseQuery = async (args, api, extraOptions) => {
 
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: dynamicBaseQuery,
+  baseQuery: mockBaseQuery,
   tagTypes: ["Student", "StudentFees", "Fee", "StudentFeesList", "Result", "StudentResultHistory", "Class"],
   endpoints: () => ({}),
 });

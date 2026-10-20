@@ -45,14 +45,7 @@ import { useGetClassByIdQuery, useUpdateClassMutation } from "@/services/private
 import { useGetStudentsQuery } from "@/services/private/studentService";
 import { toast } from "sonner";
 
-const getMediaUrl = (path) => {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  const baseUrl = import.meta.env.VITE_APP_API_URL
-    ? import.meta.env.VITE_APP_API_URL.replace("/api/", "")
-    : "http://localhost:5000";
-  return `${baseUrl}${path}`;
-};
+const getMediaUrl = (path) => path || "";
 
 const getInitials = (name) => {
   if (!name) return "?";
