@@ -75,8 +75,8 @@ const websiteItems = [
 const sections = [
   { label: "Main", items: mainItems },
   { label: "Academics", items: academicItems },
-  // { label: "Operations", items: operationItems },
-  // { label: "Resources", items: resourceItems },
+  { label: "Operations", items: operationItems },
+  { label: "Resources", items: resourceItems },
   { label: "Website", items: websiteItems },
 ];
 

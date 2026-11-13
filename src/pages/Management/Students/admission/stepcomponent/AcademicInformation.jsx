@@ -11,7 +11,7 @@ export function AcademicInformation() {
   const { values, setFieldValue, initialValues } = useFormikContext();
 
   const user = useSelector((state) => state.auth.user);
-  const academicSession = user?.academicSession || "";
+  const academicSession = user?.academicSession || "2026-2027";
 
   // Only query backend if class and section are selected and differ from initial values (e.g. edit mode checks)
   const shouldSkip = !values.class || !values.section || !academicSession || 

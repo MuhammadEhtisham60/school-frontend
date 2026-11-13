@@ -47,11 +47,7 @@ import { toast } from "sonner";
 
 const getMediaUrl = (path) => {
   if (!path) return "";
-  if (path.startsWith("http")) return path;
-  const baseUrl = import.meta.env.VITE_APP_API_URL
-    ? import.meta.env.VITE_APP_API_URL.replace("/api/", "")
-    : "http://localhost:5000";
-  return `${baseUrl}${path}`;
+  return path;
 };
 
 const getInitials = (name) => {
