@@ -51,10 +51,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import {
+  downloadFeeReceiptPDF,
+  downloadStudentFeeStatementPDF,
+  downloadTermResultCardPDF,
+  downloadCompleteThreeTermsResultCardPDF,
+} from "@/utils/pdfGenerator";
 
 const getMediaUrl = (path) => {
   if (!path) return "";
-  return path;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+  const base = (import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/").replace(/\/api\/?$/, "");
+  return `${base}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 const getInitials = (name) => {
@@ -703,28 +713,42 @@ export default function StudentDetailsPage() {
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <h3 className="text-sm font-semibold">Monthly Fee Statement</h3>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          const nextMonth = availableMonths[0] || "";
-                          setAddForm({
-                            month: nextMonth,
-                            amount: student?.classFees || student?.class_fees || "",
-                            paymentDate: new Date().toISOString().split("T")[0],
-                            paymentMethod: "Cash",
-                            status: "Paid",
-                            remarks: "",
-                          });
-                          setIsAddOpen(true);
-                        }}
-                        disabled={availableMonths.length === 0}
-                        title={availableMonths.length === 0 ? "All months already configured" : ""}
-                        className="gap-1.5 gradient-primary text-primary-foreground border-0 shadow-glow"
-                      >
-                        <Plus className="h-4 w-4" /> Add Month Fee
-                      </Button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={feeRecords.length === 0}
+                          onClick={() => {
+                            downloadStudentFeeStatementPDF(student, feeRecords);
+                            toast.success("Full fee statement PDF downloaded!");
+                          }}
+                          className="gap-1.5 font-semibold"
+                        >
+                          <Download className="h-4 w-4 text-primary" /> Statement PDF
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const nextMonth = availableMonths[0] || "";
+                            setAddForm({
+                              month: nextMonth,
+                              amount: student?.classFees || student?.class_fees || "",
+                              paymentDate: new Date().toISOString().split("T")[0],
+                              paymentMethod: "Cash",
+                              status: "Paid",
+                              remarks: "",
+                            });
+                            setIsAddOpen(true);
+                          }}
+                          disabled={availableMonths.length === 0}
+                          title={availableMonths.length === 0 ? "All months already configured" : ""}
+                          className="gap-1.5 gradient-primary text-primary-foreground border-0 shadow-glow"
+                        >
+                          <Plus className="h-4 w-4" /> Add Month Fee
+                        </Button>
+                      </div>
                     </div>
                     <div className="rounded-xl border overflow-hidden">
                       <table className="w-full text-sm">
@@ -785,6 +809,18 @@ export default function StudentDetailsPage() {
                                     </td>
                                     <td className="p-3 text-right">
                                       <div className="inline-flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-8 px-2 text-xs gap-1 font-semibold text-primary border-primary/30 hover:bg-primary/10"
+                                          onClick={() => {
+                                            downloadFeeReceiptPDF(fee, student);
+                                            toast.success(`Fee receipt PDF downloaded for ${fee.month}`);
+                                          }}
+                                          title="Download Monthly Fee Receipt PDF"
+                                        >
+                                          <Download className="h-3.5 w-3.5" /> Receipt PDF
+                                        </Button>
                                         <Button
                                           size="sm"
                                           variant="ghost"
@@ -900,19 +936,43 @@ export default function StudentDetailsPage() {
                         key={record.id}
                         className="border bg-card shadow-sm hover:shadow transition-smooth overflow-hidden"
                       >
-                        <CardHeader className="bg-muted/40 p-4 border-b flex flex-row items-center justify-between">
+                        <CardHeader className="bg-muted/40 p-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div>
                             <h4 className="font-bold text-sm text-foreground">
                               Class {record.class} ({record.academicYear})
                             </h4>
                             <p className="text-[10px] text-muted-foreground mt-0.5">
-                              Section {record.section} · Roll No: #{record.rollNo || "N/A"}
+                              Section {record.section} · Roll No: #{record.rollNo || "N/A"} ·{" "}
+                              {Object.keys(record.terms || {}).length}/3 Terms Completed
                             </p>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
                               {record.promotionStatus || "Pending"}
                             </span>
+                            {Object.keys(record.terms || {}).length >= 3 ? (
+                              <Button
+                                size="sm"
+                                className="h-8 px-2.5 text-xs gap-1.5 gradient-primary text-primary-foreground border-0 shadow-glow font-semibold"
+                                onClick={() => {
+                                  downloadCompleteThreeTermsResultCardPDF(record, student);
+                                  toast.success("Complete 3-Terms Consolidated Result Card PDF downloaded!");
+                                }}
+                                title="Download Complete 3-Terms Result Card PDF"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Download Complete 3-Terms PDF
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled
+                                className="h-8 px-2.5 text-xs gap-1.5 opacity-70"
+                                title="Complete all 3 terms (First, Mid & Final Term) to unlock the consolidated 3-terms result card"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Complete 3 Terms ({Object.keys(record.terms || {}).length}/3) for Final PDF
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               variant="ghost"
@@ -947,7 +1007,19 @@ export default function StudentDetailsPage() {
                               <div key={termName} className="space-y-3 border-b last:border-b-0 pb-4 last:pb-0">
                                 <div className="flex items-center justify-between">
                                   <h5 className="font-bold text-xs text-primary">{termName}</h5>
-                                  <div className="flex gap-1">
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2 text-[11px] gap-1 font-semibold text-primary border-primary/30 hover:bg-primary/10"
+                                      onClick={() => {
+                                        downloadTermResultCardPDF(record, termName, student);
+                                        toast.success(`${termName} Result Card PDF downloaded!`);
+                                      }}
+                                      title={`Download ${termName} Result Card PDF`}
+                                    >
+                                      <Download className="h-3 w-3" /> {termName} PDF
+                                    </Button>
                                     <Button
                                       size="sm"
                                       variant="ghost"

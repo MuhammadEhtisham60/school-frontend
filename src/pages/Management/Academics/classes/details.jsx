@@ -40,9 +40,12 @@ import {
   Plus,
   Pencil,
   X,
+  Download,
 } from "lucide-react";
 import { useGetClassByIdQuery, useUpdateClassMutation } from "@/services/private/classService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
+import { StatusBadge } from "@/components/shared/ListToolbar";
+import { downloadStudentListWithFeesPDF } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
 
 const getMediaUrl = (path) => {
@@ -303,21 +306,39 @@ export default function ClassDetailsPage() {
           </CardContent>
         </Card>
 
-        {/* Student Directory Table Card */}
+          {/* Student Directory Table Card */}
         <Card className="glass-card lg:col-span-2 border-0 shadow-sm overflow-hidden flex flex-col justify-between">
           <CardHeader className="border-b pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <CardTitle>Enrolled Students Directory</CardTitle>
               <CardDescription>Directory of all students assigned to Class {classData.name}</CardDescription>
             </div>
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search students..."
-                className="pl-9 w-[200px]"
-                value={studentSearch}
-                onChange={(e) => setStudentSearch(e.target.value)}
-              />
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search students..."
+                  className="pl-9 w-[180px]"
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 h-9 text-xs font-semibold"
+                disabled={filteredStudents.length === 0}
+                onClick={() => {
+                  downloadStudentListWithFeesPDF(filteredStudents, {
+                    classFilter: classData.name,
+                    sectionFilter: "all",
+                    feeStatusFilter: "all",
+                  });
+                  toast.success(`Class ${classData.name} student list with fee status downloaded!`);
+                }}
+              >
+                <Download className="h-3.5 w-3.5 text-primary" /> Export PDF (Fee Status)
+              </Button>
             </div>
           </CardHeader>
           
@@ -338,6 +359,7 @@ export default function ClassDetailsPage() {
                     <TableHead>Roll No</TableHead>
                     <TableHead>Father's Name</TableHead>
                     <TableHead>Contact</TableHead>
+                    <TableHead>Fee Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -363,6 +385,9 @@ export default function ClassDetailsPage() {
                       <TableCell className="font-mono text-sm">#{s.rollNo || "N/A"}</TableCell>
                       <TableCell>{s.fatherName}</TableCell>
                       <TableCell className="text-xs">{s.mobile || s.contact || "N/A"}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={s.feeStatus || "Paid"} />
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button
                           size="icon"

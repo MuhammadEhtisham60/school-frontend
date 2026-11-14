@@ -15,7 +15,7 @@ export const CancelButton = React.forwardRef(
       fullWidth = false,
       size = "medium",
       variant = "outlined",
-      color = "secondary",
+      color = "primary",
       startIcon,
       endIcon,
       sx,

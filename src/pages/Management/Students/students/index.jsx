@@ -32,13 +32,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useGetStudentsQuery, useDeleteStudentMutation } from "@/services/private/studentService";
 import { useGetClassesDropdownQuery } from "@/services/private/classService";
-import { Pencil, Trash2, Eye, GraduationCap, Loader2, AlertCircle } from "lucide-react";
+import { Pencil, Trash2, Eye, GraduationCap, Loader2, AlertCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { StatCard } from "@/components/ui/stat-card";
+import { downloadStudentListWithFeesPDF } from "@/utils/pdfGenerator";
 
 const getMediaUrl = (path) => {
   if (!path) return "";
-  return path;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+  const base = (import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/").replace(/\/api\/?$/, "");
+  return `${base}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 const getInitials = (name) => {
@@ -60,6 +65,7 @@ function StudentsPage() {
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState(initialClass);
   const [sectionFilter, setSectionFilter] = useState("all");
+  const [feeStatusFilter, setFeeStatusFilter] = useState("all");
 
   useEffect(() => {
     const classParam = queryParams.get("class");
@@ -84,11 +90,30 @@ function StudentsPage() {
 
   const [deleteStudent, { isLoading: isDeleting }] = useDeleteStudentMutation();
 
-  const studentsList = data?.students || [];
+  const rawStudentsList = data?.students || [];
+  const studentsList = useMemo(() => {
+    if (feeStatusFilter === "all") return rawStudentsList;
+    return rawStudentsList.filter(
+      (s) => String(s.feeStatus || "Paid").toLowerCase() === feeStatusFilter.toLowerCase()
+    );
+  }, [rawStudentsList, feeStatusFilter]);
 
-  const total = studentsList.length;
-  const active = studentsList.filter((s) => s.is_active).length;
-  const fees = studentsList.filter((s) => (s.feeStatus || "Paid") === "Paid").length;
+  const total = rawStudentsList.length;
+  const active = rawStudentsList.filter((s) => s.is_active).length;
+  const fees = rawStudentsList.filter((s) => (s.feeStatus || "Paid") === "Paid").length;
+
+  const handleDownloadStudentsPDF = () => {
+    if (studentsList.length === 0) {
+      toast.error("No student records available to export");
+      return;
+    }
+    downloadStudentListWithFeesPDF(studentsList, {
+      classFilter,
+      sectionFilter,
+      feeStatusFilter,
+    });
+    toast.success("Student list with fee status downloaded as PDF!");
+  };
 
   const triggerDelete = (id, name) => {
     setDeleteId(id);
@@ -116,6 +141,16 @@ function StudentsPage() {
         eyebrow="Directory"
         title="Students"
         description="Browse, search and manage every enrolled student."
+        actions={
+          <Button
+            onClick={handleDownloadStudentsPDF}
+            variant="outline"
+            disabled={studentsList.length === 0}
+            className="gap-2 font-semibold"
+          >
+            <Download className="h-4 w-4 text-primary" /> Download Student List PDF (with Fee Status)
+          </Button>
+        }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -161,6 +196,16 @@ function StudentsPage() {
                   Section {s}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={feeStatusFilter} onValueChange={setFeeStatusFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Fee Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Fee Status</SelectItem>
+              <SelectItem value="Paid">Fee Paid</SelectItem>
+              <SelectItem value="Pending">Fee Pending</SelectItem>
             </SelectContent>
           </Select>
         </div>

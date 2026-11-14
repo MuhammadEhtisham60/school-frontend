@@ -38,9 +38,13 @@ const mainItems = [
   { title: "Admissions", url: "/admission", icon: UserPlus },
   { title: "Students", url: "/students", icon: GraduationCap },
   { title: "Teachers", url: "/teachers", icon: BookOpen },
+];
+
+const administrationItems = [
   { title: "Admins", url: "/admins", icon: ShieldCheck },
   { title: "User Management", url: "/users", icon: Users },
   { title: "Role Based Users", url: "/role-users", icon: UserCog },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 const academicItems = [
@@ -64,7 +68,6 @@ const operationItems = [
 const resourceItems = [
   { title: "File Manager", url: "/file-manager", icon: FolderOpen },
   { title: "Paper Collection", url: "/paper-collection", icon: FileStack },
-  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 const websiteItems = [
@@ -76,6 +79,7 @@ const sections = [
   { label: "Main", items: mainItems },
   { label: "Academics", items: academicItems },
   { label: "Operations", items: operationItems },
+  { label: "Administration", items: administrationItems },
   { label: "Resources", items: resourceItems },
   { label: "Website", items: websiteItems },
 ];

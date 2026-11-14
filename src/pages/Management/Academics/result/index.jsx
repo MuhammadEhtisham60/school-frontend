@@ -53,6 +53,10 @@ import {
 } from "@/services/private/resultService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
 import { useGetClassesDropdownQuery } from "@/services/private/classService";
+import {
+  downloadTermResultCardPDF,
+  downloadCompleteThreeTermsResultCardPDF,
+} from "@/utils/pdfGenerator";
 
 const ACADEMIC_YEARS = ["2023-2024", "2024-2025", "2025-2026", "2026-2027"];
 const TERMS = ["First Term", "Mid Term", "Final Term"];
@@ -659,7 +663,32 @@ function ResultPage() {
                         <span className="text-xs text-muted-foreground">({res.gpa} GPA)</span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="inline-flex gap-1">
+                        <div className="inline-flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2 text-xs gap-1 font-semibold text-primary border-primary/30 hover:bg-primary/10"
+                            onClick={() => {
+                              downloadTermResultCardPDF(res.record, res.termName);
+                              toast.success(`${res.termName} Result Card PDF downloaded for ${res.studentName}`);
+                            }}
+                            title={`Download ${res.termName} Result Card PDF`}
+                          >
+                            <Download className="h-3.5 w-3.5" /> Term PDF
+                          </Button>
+                          {Object.keys(res.record?.terms || {}).length >= 3 && (
+                            <Button
+                              size="sm"
+                              className="h-8 px-2 text-xs gap-1 gradient-primary text-primary-foreground border-0 font-semibold"
+                              onClick={() => {
+                                downloadCompleteThreeTermsResultCardPDF(res.record);
+                                toast.success(`Complete 3-Terms Result Card PDF downloaded for ${res.studentName}`);
+                              }}
+                              title="Download Complete 3-Terms Consolidated Result Card PDF"
+                            >
+                              <Download className="h-3.5 w-3.5" /> 3-Terms PDF
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon"

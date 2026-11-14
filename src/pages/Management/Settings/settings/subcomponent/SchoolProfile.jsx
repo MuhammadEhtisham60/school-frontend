@@ -45,7 +45,7 @@ export function SchoolProfile() {
     firstName: profile.firstName || "",
     lastName: profile.lastName || "",
     email: profile.email || "",
-    schoolName: profile.schoolName || "",
+    schoolName: profile.schoolName || "The Force School System",
     contact: profile.contact || "",
     academicSession: profile.academicSession || "",
     address: profile.address || "",

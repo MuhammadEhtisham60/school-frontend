@@ -57,7 +57,7 @@ function AdmissionPage() {
   const isEditMode = !!id;
   const [step, setStep] = useState(1);
   const user = useSelector((state) => state.auth.user);
-  const academicSession = user?.academicSession || "";
+  const academicSession = user?.academicSession || "2026-2027";
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
 
@@ -85,12 +85,12 @@ function AdmissionPage() {
       dob: student.dob || "",
       gender: student.gender || "",
       cnic: student.cnic || "",
-      photo: null,
+      photo: student.photo || null,
       class: student.class || "",
       class_fees: student.classFees !== undefined ? student.classFees : student.class_fees || "",
       section: student.section || "",
       prevSchool: student.prevSchool || "",
-      lastResult: student.lastResult || "",
+      lastResult: student.lastResult ?? "",
       admissionDate: student.admissionDate || getTodayDateString(),
       mobile: student.mobile || "",
       altContact: student.altContact || "",
@@ -111,10 +111,10 @@ function AdmissionPage() {
       busRoute: student.busRoute || "",
       hostel: student.hostel || false,
       is_active: student.is_active !== undefined ? student.is_active : (student.isActive !== undefined ? student.isActive : true),
-      studentPhoto: null,
-      bFormCopy: null,
-      prevResultCard: null,
-      guardianCnic: null,
+      studentPhoto: student.studentPhoto || null,
+      bFormCopy: student.bFormCopy || null,
+      prevResultCard: student.prevResultCard || null,
+      guardianCnic: student.guardianCnic || null,
     };
   };
 
@@ -127,6 +127,8 @@ function AdmissionPage() {
     );
   }
 
+  const fileFields = new Set(["photo", "studentPhoto", "bFormCopy", "prevResultCard", "guardianCnic"]);
+
   return (
     <Formik
       initialValues={getFormValues()}
@@ -137,7 +139,13 @@ function AdmissionPage() {
           const formData = new FormData();
           Object.entries(values).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
-              formData.append(key, value);
+              if (fileFields.has(key)) {
+                if (value instanceof File) {
+                  formData.append(key, value);
+                }
+              } else {
+                formData.append(key, value);
+              }
             }
           });
           // Append active academic session

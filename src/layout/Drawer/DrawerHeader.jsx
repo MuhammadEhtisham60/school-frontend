@@ -12,8 +12,8 @@ export function DrawerHeader({ collapsed }) {
         </div>
         {!collapsed && (
           <div className="flex flex-col leading-tight">
-            <span className="text-base font-bold text-gradient">EPS</span>
-            <span className="text-[11px] text-muted-foreground">School ERP Suite</span>
+            <span className="text-sm font-bold text-gradient">The Force School</span>
+            <span className="text-[11px] text-muted-foreground">The Force School System</span>
           </div>
         )}
       </Link>

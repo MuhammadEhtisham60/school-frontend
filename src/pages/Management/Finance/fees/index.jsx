@@ -11,6 +11,7 @@ import {
   Pencil,
   Trash2,
   Loader2,
+  Download,
 } from "lucide-react";
 import {
   Table,
@@ -50,6 +51,7 @@ import {
   useDeleteFeeMutation,
 } from "@/services/private/feeService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
+import { downloadFeeReceiptPDF, downloadStudentListWithFeesPDF } from "@/utils/pdfGenerator";
 
 const MONTHS_ORDER = [
   "January",
@@ -316,6 +318,23 @@ function FeesPage() {
         eyebrow="Finance"
         title="Fees"
         description="Collection overview and student-wise fee status."
+        actions={
+          <Button
+            variant="outline"
+            className="gap-2 font-semibold"
+            disabled={(studentsData?.students || []).length === 0}
+            onClick={() => {
+              downloadStudentListWithFeesPDF(studentsData?.students || [], {
+                classFilter: "all",
+                sectionFilter: "all",
+                feeStatusFilter: statusFilter,
+              });
+              toast.success("Student list with fee status downloaded as PDF!");
+            }}
+          >
+            <Download className="h-4 w-4 text-primary" /> Download Student List PDF (with Fee Status)
+          </Button>
+        }
       />
 
       {/* Stats Cards */}
@@ -477,6 +496,18 @@ function FeesPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2 text-xs gap-1 font-semibold text-primary border-primary/30 hover:bg-primary/10"
+                        onClick={() => {
+                          downloadFeeReceiptPDF(fee);
+                          toast.success(`Fee receipt PDF downloaded for ${fee.studentId?.name || "student"} (${fee.month})`);
+                        }}
+                        title="Download Fee Receipt PDF"
+                      >
+                        <Download className="h-3.5 w-3.5" /> Receipt PDF
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
