@@ -48,6 +48,8 @@ export const CancelButton = React.forwardRef(
           textTransform: "none",
           color: "text.secondary",
           borderColor: "divider",
+            color: "text.primary",
+
           "&:hover": {
             color: "text.primary",
             borderColor: "text.secondary",
