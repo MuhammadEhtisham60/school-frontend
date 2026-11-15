@@ -10,7 +10,7 @@ const variantClass = {
 export function StatCard({ label, value, icon: Icon, trend, variant = "primary", sub }) {
   const positive = (trend ?? 0) >= 0;
   return (
-    <Card className="relative overflow-hidden p-5 card-hover gradient-card border-border/60 shadow-card">
+    <Card className="relative overflow-hidden p-4 card-hover gradient-card border-border/60 shadow-card">
       <div
         className={cn(
           "absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-20 blur-2xl",
@@ -21,7 +21,7 @@ export function StatCard({ label, value, icon: Icon, trend, variant = "primary",
         <div>
           <p className="text-sm text-muted-foreground font-medium">{label}</p>
           <p className="text-3xl font-bold mt-1.5 tracking-tight">{value}</p>
-          {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+          {/* {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>} */}
           {trend !== undefined && (
             <div
               className={cn(
@@ -37,7 +37,7 @@ export function StatCard({ label, value, icon: Icon, trend, variant = "primary",
         </div>
         <div
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl shadow-glow",
+            "flex h-11 w-11 items-center justify-center rounded-md shadow-glow",
             variantClass[variant],
           )}
         >
