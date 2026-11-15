@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import {
   Loader2,
   AlertCircle,
   GraduationCap,
+  FileSpreadsheet,
+  FileDown,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
@@ -53,10 +56,13 @@ import {
 } from "@/services/private/resultService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
 import { useGetClassesDropdownQuery } from "@/services/private/classService";
+import { useGetSubjectsQuery } from "@/services/private/subjectService";
 import {
   downloadTermResultCardPDF,
   downloadCompleteThreeTermsResultCardPDF,
+  downloadResultsLedgerPDF,
 } from "@/utils/pdfGenerator";
+import { downloadExcelFile } from "@/utils/excelExport";
 
 const ACADEMIC_YEARS = ["2023-2024", "2024-2025", "2025-2026", "2026-2027"];
 const TERMS = ["First Term", "Mid Term", "Final Term"];
@@ -109,6 +115,12 @@ function ResultPage() {
   const { data: classesResponse } = useGetClassesDropdownQuery();
   const classesList = classesResponse?.data || [];
 
+  const { data: subjectsResponse } = useGetSubjectsQuery();
+  const subjectsList = useMemo(
+    () => (subjectsResponse?.data || subjectsResponse?.subjects || []).filter((s) => s.isActive !== false),
+    [subjectsResponse]
+  );
+
   // Mutations
   const [createResult, { isLoading: isCreating }] = useCreateResultMutation();
   const [updateResult, { isLoading: isUpdating }] = useUpdateResultMutation();
@@ -153,7 +165,7 @@ function ResultPage() {
           }
           if (pct > topObtained) {
             topObtained = pct;
-            topStudent = record.studentId?.name || "Jane Doe";
+            topStudent = record.studentId?.name || record.studentId?.fullName || "—";
           }
 
           toppersList.push({
@@ -220,11 +232,7 @@ function ResultPage() {
       avgScore,
       distinctionsVal,
       topStudent,
-      chartData: chartData.length > 0 ? chartData : [
-        { subject: "Math", average: 75, top: 95 },
-        { subject: "Science", average: 80, top: 98 },
-        { subject: "English", average: 70, top: 92 },
-      ],
+      chartData,
       toppers: toppersList.sort((a, b) => b.percentage - a.percentage).slice(0, 5),
       flattenedResults: flattened,
     };
@@ -394,37 +402,91 @@ function ResultPage() {
     }
   };
 
+  const handleExportExcel = () => {
+    downloadExcelFile({
+      filename: `Results_Ledger_${new Date().toISOString().slice(0, 10)}`,
+      sheetName: "Results",
+      title: "Academic Results Ledger",
+      headers: [
+        "Student Name",
+        "Class",
+        "Section",
+        "Roll No",
+        "Academic Year",
+        "Examination",
+        "Score",
+        "Grade",
+        "GPA",
+        "Status",
+      ],
+      rows: filteredResults.map((r) => [
+        r.studentName || "",
+        `Class ${r.class}`,
+        r.section || "",
+        r.rollNo || "",
+        r.academicYear || "",
+        r.termName || "",
+        r.score || "",
+        r.grade || "",
+        r.gpa ?? 0,
+        r.status || "",
+      ]),
+    });
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       <PageHeader
         eyebrow="Academics"
         title="Result Management"
         description="Track student performance, publish marks and analyze academic trends."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportExcel}
+              disabled={filteredResults.length === 0}
+              className="gap-1.5"
+            >
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadResultsLedgerPDF(filteredResults)}
+              disabled={filteredResults.length === 0}
+              className="gap-1.5"
+            >
+              <FileDown className="h-4 w-4 text-primary" /> PDF
+            </Button>
+          </div>
+        }
       />
 
       {/* Stats Overview */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Overall Pass Rate"
-          value={metrics.passRate}
+          value={isResultsLoading ? "..." : metrics.passRate}
           icon={CheckCircle2}
           variant="success"
         />
         <StatCard
           label="Average Score"
-          value={metrics.avgScore}
+          value={isResultsLoading ? "..." : metrics.avgScore}
           icon={TrendingUp}
           variant="info"
         />
         <StatCard
           label="Distinctions"
-          value={metrics.distinctionsVal}
+          value={isResultsLoading ? "..." : metrics.distinctionsVal}
           icon={Award}
           variant="warning"
         />
         <StatCard
           label="Top Performer"
-          value={metrics.topStudent}
+          value={isResultsLoading ? "..." : metrics.topStudent}
           icon={Trophy}
           variant="primary"
         />
@@ -438,38 +500,48 @@ function ResultPage() {
             <CardDescription>Average vs Top scores across departments (%)</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={metrics.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                  <XAxis
-                    dataKey="subject"
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    domain={[0, 100]}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "var(--muted)", opacity: 0.4 }}
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 12,
-                      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-                    }}
-                  />
-                  <Bar dataKey="average" fill="oklch(0.55 0.22 280)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="top" fill="oklch(0.7 0.18 320)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            {isResultsLoading ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : metrics.chartData.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-sm text-muted-foreground">
+                No subject performance data available for the selected filters.
+              </div>
+            ) : (
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={metrics.chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                    <XAxis
+                      dataKey="subject"
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      domain={[0, 100]}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "var(--muted)", opacity: 0.4 }}
+                      contentStyle={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 12,
+                        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                      }}
+                    />
+                    <Bar dataKey="average" fill="oklch(0.55 0.22 280)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="top" fill="oklch(0.7 0.18 320)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             <div className="flex items-center justify-center gap-6 mt-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[oklch(0.55_0.22_280)]" />
@@ -650,7 +722,18 @@ function ResultPage() {
                 <tbody className="divide-y divide-border/50">
                   {filteredResults.map((res, index) => (
                     <tr key={index} className="hover:bg-muted/30 transition-colors group">
-                      <td className="px-6 py-4 font-bold text-foreground">{res.studentName}</td>
+                      <td className="px-6 py-4 font-bold text-foreground">
+                        {res.studentId ? (
+                          <Link
+                            to={`/students/details/${res.studentId}`}
+                            className="hover:text-primary hover:underline"
+                          >
+                            {res.studentName}
+                          </Link>
+                        ) : (
+                          res.studentName
+                        )}
+                      </td>
                       <td className="px-6 py-4">Class {res.class}-{res.section}</td>
                       <td className="px-6 py-4 font-mono">#{res.rollNo || "N/A"}</td>
                       <td className="px-6 py-4 text-xs text-muted-foreground">{res.academicYear}</td>
@@ -726,6 +809,11 @@ function ResultPage() {
       </Card>
 
       {/* Global Add Result Dialog */}
+      <datalist id="result-subjects-list">
+        {subjectsList.map((s) => (
+          <option key={s.id} value={s.name} />
+        ))}
+      </datalist>
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -854,6 +942,7 @@ function ResultPage() {
                     <div className="flex-1 space-y-1.5">
                       <Label className="text-[10px] text-muted-foreground">Subject Name</Label>
                       <Input
+                        list="result-subjects-list"
                         value={subj.subjectName}
                         onChange={(e) => handleSubjectChange("add", index, "subjectName", e.target.value)}
                         placeholder="Mathematics"

@@ -14,7 +14,16 @@ import {
   UsersPage,
   RoleUsersPage,
 } from "@/pages/Management/Employees";
-import { ClassRoutinePage, SubjectsPage, ExamPage, ResultPage, ClassesPage, ClassDetailsPage } from "@/pages/Management/Academics";
+import {
+  ClassRoutinePage,
+  SubjectsPage,
+  SubjectDetailsPage,
+  ExamPage,
+  ExamDetailsPage,
+  ResultPage,
+  ClassesPage,
+  ClassDetailsPage,
+} from "@/pages/Management/Academics";
 import {
   FileManagerPage,
   LibraryPage,
@@ -86,12 +95,20 @@ export const privateRoutes = [
         element: <SubjectsPage />,
       },
       {
+        path: "/subjects/:id",
+        element: <SubjectDetailsPage />,
+      },
+      {
         path: "/class-routine",
         element: <ClassRoutinePage />,
       },
       {
         path: "/exam",
         element: <ExamPage />,
+      },
+      {
+        path: "/exam/:id",
+        element: <ExamDetailsPage />,
       },
       {
         path: "/result",

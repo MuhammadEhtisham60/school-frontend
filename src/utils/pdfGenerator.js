@@ -1318,4 +1318,306 @@ export function downloadTeacherProfilePDF(teacher) {
   doc.save(`Teacher_Profile_${sanitizeFilename(teacherName)}.pdf`);
 }
 
+/**
+ * 10. Download Subjects Directory PDF
+ */
+export function downloadSubjectsListPDF(subjects = [], subtitle = "Curriculum & Faculty Allocation") {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const y = drawSchoolHeader(doc, "Academic Subjects Directory", subtitle);
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Code", "Subject", "Department", "Type", "Periods/Wk", "Classes", "Assigned Teacher", "Status"]],
+    body: subjects.map((s) => [
+      s.code || "—",
+      s.name || "—",
+      s.department || "—",
+      s.subjectType || "Core",
+      `${s.weeklyPeriods ?? 5}`,
+      Array.isArray(s.classes) && s.classes.length ? s.classes.join(", ") : "—",
+      s.teacher || s.teacherName || "Unassigned",
+      s.isActive === false ? "Inactive" : "Active",
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Academic Coordinator", "Vice Principal", "Principal"]);
+  doc.save(`Subjects_Directory_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+/**
+ * 11. Download Single Subject Dossier PDF
+ */
+export function downloadSubjectDetailPDF(subject, routines = [], exams = []) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const subjectName = subject?.name || "Subject";
+
+  let y = drawSchoolHeader(
+    doc,
+    "Subject Curriculum & Schedule Dossier",
+    `Code: ${subject?.code || "—"}   |   Department: ${subject?.department || "—"}   |   Type: ${subject?.subjectType || "Core"}`
+  );
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Attribute", "Details"]],
+    body: [
+      ["Subject Name", subjectName],
+      ["Subject Code", subject?.code || "—"],
+      ["Department", subject?.department || "—"],
+      ["Subject Type", subject?.subjectType || "Core"],
+      ["Weekly Periods", `${subject?.weeklyPeriods ?? 5} periods / week`],
+      ["Assigned Teacher", subject?.teacher || subject?.teacherName || "Unassigned"],
+      [
+        "Classes Covered",
+        Array.isArray(subject?.classes) && subject.classes.length
+          ? subject.classes.map((c) => `Class ${c}`).join(", ")
+          : "Not mapped",
+      ],
+      ["Status", subject?.isActive === false ? "Inactive" : "Active"],
+      ["Description", subject?.description || "—"],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8.5, cellPadding: 3 },
+    columnStyles: { 0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 48 } },
+    margin: { left: 14, right: 14 },
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+
+  if (routines.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text("WEEKLY TIMETABLE SLOTS", 14, y);
+    y += 3;
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Day", "Time", "Class & Section", "Teacher", "Room"]],
+      body: routines.map((r) => [
+        r.day || "—",
+        `${r.startTime || ""} - ${r.endTime || ""}`,
+        `Class ${r.className}-${r.section}`,
+        r.teacher || r.teacherName || "Unassigned",
+        r.room || "—",
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 8.5 },
+      bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
+      margin: { left: 14, right: 14 },
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
+  if (exams.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text("SCHEDULED & PAST EXAMS", 14, y);
+    y += 3;
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Exam Name", "Class", "Type", "Date", "Marks", "Status"]],
+      body: exams.map((ex) => [
+        ex.name || "—",
+        `Class ${ex.className}`,
+        ex.examType || ex.type || "—",
+        ex.date || "—",
+        `${ex.marks ?? ex.totalMarks ?? 100}`,
+        ex.status || "Scheduled",
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+      bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
+      margin: { left: 14, right: 14 },
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
+  drawSignatureFooter(doc, y + 6, ["Head of Department", "Academic Coordinator", "Principal"]);
+  doc.save(`Subject_${sanitizeFilename(subjectName)}.pdf`);
+}
+
+/**
+ * 12. Download Weekly Class Routine Timetable PDF
+ */
+export function downloadClassRoutinePDF(className, section, timeSlots = [], routines = []) {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  const y = drawSchoolHeader(
+    doc,
+    "Official Weekly Class Timetable",
+    `Class: ${className || "All"}   |   Section: ${section || "All"}   |   Total Periods: ${routines.length}`
+  );
+
+  const slotMap = new Map();
+  routines.forEach((r) => {
+    slotMap.set(`${r.day}__${r.startTime}-${r.endTime}`, r);
+  });
+
+  const head = [["Day", ...timeSlots.map((s) => `${s.startTime} - ${s.endTime}`)]];
+  const body = days.map((day) => [
+    day,
+    ...timeSlots.map((slot) => {
+      const p = slotMap.get(`${day}__${slot.startTime}-${slot.endTime}`);
+      if (!p) return "—";
+      const teacher = p.teacher || p.teacherName || "";
+      const room = p.room ? ` (${p.room})` : "";
+      return `${p.subject}${teacher ? `\n${teacher}` : ""}${room}`;
+    }),
+  ]);
+
+  autoTable(doc, {
+    startY: y,
+    head,
+    body,
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8, halign: "center" },
+    bodyStyles: { fontSize: 7.5, cellPadding: 2.5, halign: "center", valign: "middle" },
+    columnStyles: { 0: { fontStyle: "bold", fillColor: [241, 245, 249], halign: "left", cellWidth: 26 } },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Class Teacher", "Timetable In-Charge", "Principal"]);
+  doc.save(`Class_Routine_${sanitizeFilename(className)}_${sanitizeFilename(section)}.pdf`);
+}
+
+/**
+ * 13. Download Exams Schedule / Date Sheet PDF
+ */
+export function downloadExamsListPDF(exams = [], subtitle = "Official Examination Date Sheet") {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const y = drawSchoolHeader(doc, "Examination Schedule & Date Sheet", subtitle);
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Exam Name", "Class", "Subject", "Type", "Date & Time", "Marks", "Duration", "Room", "Status"]],
+    body: exams.map((ex) => [
+      ex.name || "—",
+      `Class ${ex.className}`,
+      ex.subject || "—",
+      ex.examType || ex.type || "—",
+      `${ex.date || "—"}${ex.startTime ? ` ${ex.startTime}` : ""}`,
+      `${ex.marks ?? ex.totalMarks ?? 100}`,
+      `${ex.duration ?? 180} mins`,
+      ex.room || "—",
+      ex.status || "Scheduled",
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8, cellPadding: 2.6 },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Controller of Exams", "Academic Coordinator", "Principal"]);
+  doc.save(`Exam_DateSheet_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+/**
+ * 14. Download Single Exam Date Sheet & Attendance Sheet PDF
+ */
+export function downloadExamDetailPDF(exam, students = []) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const examName = exam?.name || "Examination";
+
+  let y = drawSchoolHeader(
+    doc,
+    "Official Examination Sheet & Roll Call",
+    `Class ${exam?.className || "—"}   |   Subject: ${exam?.subject || "—"}   |   Date: ${exam?.date || "—"}`
+  );
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Field", "Details", "Field", "Details"]],
+    body: [
+      ["Exam Name", examName, "Exam Type", exam?.examType || exam?.type || "—"],
+      ["Class", `Class ${exam?.className || "—"}`, "Subject", exam?.subject || "—"],
+      ["Date", exam?.date || "—", "Start Time", exam?.startTime || "09:00"],
+      ["Total Marks", `${exam?.marks ?? exam?.totalMarks ?? 100}`, "Passing Marks", `${exam?.passingMarks ?? 40}`],
+      ["Duration", `${exam?.duration ?? 180} mins`, "Room / Hall", exam?.room || "—"],
+      ["Status", exam?.status || "Scheduled", "Results", exam?.resultsPublished ? "Published" : "Pending"],
+      ["Instructions", exam?.instructions || "Standard examination rules apply.", "", ""],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8.5, cellPadding: 3 },
+    columnStyles: {
+      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 32 },
+      1: { cellWidth: 59 },
+      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 32 },
+      3: { cellWidth: 59 },
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+
+  if (students.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`CANDIDATE ATTENDANCE & MARKS SHEET (${students.length} Students)`, 14, y);
+    y += 3;
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Roll No", "Student Name", "Section", "Attendance", "Marks Obtained", "Signature"]],
+      body: students.map((st, idx) => [
+        st.rollNo || `${idx + 1}`,
+        st.fullName || st.name || "—",
+        st.section || "A",
+        "P / A",
+        `____ / ${exam?.marks ?? exam?.totalMarks ?? 100}`,
+        "",
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 8.5 },
+      bodyStyles: { fontSize: 8.5, cellPadding: 3 },
+      margin: { left: 14, right: 14 },
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
+  drawSignatureFooter(doc, y + 6, ["Invigilator", "Controller of Exams", "Principal"]);
+  doc.save(`Exam_${sanitizeFilename(examName)}.pdf`);
+}
+
+/**
+ * 15. Download Consolidated Results Ledger PDF
+ */
+export function downloadResultsLedgerPDF(results = [], subtitle = "Academic Results Ledger") {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const y = drawSchoolHeader(doc, "Academic Results Ledger", subtitle);
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Student Name", "Class", "Roll No", "Year", "Term", "Score", "Grade", "GPA", "Status"]],
+    body: results.map((r) => [
+      r.studentName || "—",
+      `Class ${r.class}-${r.section}`,
+      r.rollNo || "—",
+      r.academicYear || "—",
+      r.termName || "—",
+      r.score || "—",
+      r.grade || "—",
+      `${r.gpa ?? 0}`,
+      r.status || "—",
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8, cellPadding: 2.6 },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Controller of Exams", "Academic Coordinator", "Principal"]);
+  doc.save(`Results_Ledger_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
 
