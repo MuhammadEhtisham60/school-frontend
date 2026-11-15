@@ -109,6 +109,70 @@ export const resourceApi = baseApi.injectEndpoints({
         { type: "Notice", id: "LIST" },
       ],
     }),
+
+    // ==========================================
+    // PAPER COLLECTION
+    // ==========================================
+    getPapers: builder.query({
+      query: (params) => ({
+        url: "papers",
+        method: "GET",
+        params,
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map(({ id }) => ({ type: "QuestionPaper", id })),
+              { type: "QuestionPaper", id: "LIST" },
+            ]
+          : [{ type: "QuestionPaper", id: "LIST" }],
+    }),
+    getPaperById: builder.query({
+      query: (id) => ({
+        url: `papers/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "QuestionPaper", id }],
+    }),
+    createPaper: builder.mutation({
+      query: (body) => ({
+        url: "papers",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "QuestionPaper", id: "LIST" }],
+    }),
+    updatePaper: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `papers/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "QuestionPaper", id },
+        { type: "QuestionPaper", id: "LIST" },
+      ],
+    }),
+    deletePaper: builder.mutation({
+      query: (id) => ({
+        url: `papers/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: "QuestionPaper", id },
+        { type: "QuestionPaper", id: "LIST" },
+      ],
+    }),
+    downloadPaper: builder.mutation({
+      query: (id) => ({
+        url: `papers/${id}/download`,
+        method: "POST",
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: "QuestionPaper", id },
+        { type: "QuestionPaper", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -123,5 +187,11 @@ export const {
   useCreateNoticeMutation,
   useUpdateNoticeMutation,
   useDeleteNoticeMutation,
+  useGetPapersQuery,
+  useGetPaperByIdQuery,
+  useCreatePaperMutation,
+  useUpdatePaperMutation,
+  useDeletePaperMutation,
+  useDownloadPaperMutation,
 } = resourceApi;
 
