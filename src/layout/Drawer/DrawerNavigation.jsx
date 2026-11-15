@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import { baseApi } from "@/services";
+import { useGetClassesDropdownQuery } from "@/services/private/classService";
 import { Sidebar, useSidebar } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -93,10 +94,30 @@ export function DrawerNavigation() {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { data: classesRes } = useGetClassesDropdownQuery();
 
-  const isActive = (path) => {
-    if (path === "/backoffice") return pathname === "/backoffice";
-    return pathname.startsWith(path);
+  const dynamicSections = useMemo(() => {
+    const activeClasses = classesRes?.data || [];
+    const classChildren = activeClasses.map((c) => ({
+      title: `Class ${c.name}`,
+      url: `/classes/${c.id || c._id}`,
+      badge: typeof c.studentCount === "number" ? c.studentCount : undefined,
+    }));
+
+    return sections.map((sec) => {
+      if (sec.label !== "Academics") return sec;
+      return {
+        ...sec,
+        items: sec.items.map((item) =>
+          item.url === "/classes" ? { ...item, children: classChildren } : item
+        ),
+      };
+    });
+  }, [classesRes]);
+
+  const isActive = (path, exact = false) => {
+    if (path === "/backoffice" || exact) return pathname === path;
+    return pathname === path || pathname.startsWith(`${path}/`);
   };
 
   const handleLogout = () => {
@@ -108,7 +129,12 @@ export function DrawerNavigation() {
   return (
     <Sidebar collapsible="icon" className="border-r">
       <DrawerHeader collapsed={collapsed} />
-      <DrawerContent sections={sections} collapsed={collapsed} isActive={isActive} />
+      <DrawerContent
+        sections={dynamicSections}
+        collapsed={collapsed}
+        isActive={isActive}
+        pathname={pathname}
+      />
       <DrawerFooter collapsed={collapsed} user={user} onLogout={handleLogout} />
     </Sidebar>
   );
