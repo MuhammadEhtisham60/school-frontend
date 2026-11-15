@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { useGetClassByIdQuery, useUpdateClassMutation } from "@/services/private/classService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
+import { useGetTeachersQuery } from "@/services/private/teacherService";
 import { StatusBadge } from "@/components/shared/ListToolbar";
 import { downloadStudentListWithFeesPDF } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
@@ -81,6 +82,12 @@ export default function ClassDetailsPage() {
     { skip: !classData?.name }
   );
   const studentsList = studentsResponse?.students || [];
+
+  const { data: teachersResponse } = useGetTeachersQuery(
+    { class: classData?.name },
+    { skip: !classData?.name }
+  );
+  const assignedTeachers = teachersResponse?.teachers || [];
 
   // Edit Class Form State
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -291,7 +298,7 @@ export default function ClassDetailsPage() {
               </DialogContent>
             </Dialog>
           </CardHeader>
-          <CardContent className="flex-1">
+          <CardContent className="flex-1 space-y-5">
             <div className="flex flex-wrap gap-2">
               {classData.subjects && classData.subjects.length > 0 ? (
                 classData.subjects.map((sub, idx) => (
@@ -301,6 +308,43 @@ export default function ClassDetailsPage() {
                 ))
               ) : (
                 <span className="text-sm text-muted-foreground italic">No subjects assigned yet</span>
+              )}
+            </div>
+
+            <div className="pt-4 border-t space-y-2.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5 text-primary" /> Assigned Faculty ({assignedTeachers.length})
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-[11px] text-primary"
+                  onClick={() => navigate(`/teachers?class=${encodeURIComponent(classData.name)}`)}
+                >
+                  View All
+                </Button>
+              </div>
+              {assignedTeachers.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">No faculty assigned to Class {classData.name} yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {assignedTeachers.map((t) => (
+                    <div
+                      key={t.id}
+                      onClick={() => navigate(`/teachers/details/${t.id}`)}
+                      className="flex items-center justify-between p-2 rounded-lg border bg-muted/20 hover:bg-muted/40 cursor-pointer transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold truncate">{t.fullName || t.name}</p>
+                        <p className="text-[10px] text-primary font-medium">{t.subject}</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-mono shrink-0">
+                        {t.employeeId}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </CardContent>

@@ -913,3 +913,409 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
   doc.save(`Student_List_With_Fee_Status${sanitizeFilename(suffix)}.pdf`);
 }
 
+/**
+ * 6. Download Faculty Directory & Payroll Status PDF
+ */
+export function downloadTeacherListPDF(teachersList = [], filters = {}) {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const filterDescParts = [];
+  if (filters.departmentFilter && filters.departmentFilter !== "all") {
+    filterDescParts.push(`Department: ${filters.departmentFilter}`);
+  }
+  if (filters.classFilter && filters.classFilter !== "all") {
+    filterDescParts.push(`Class: ${filters.classFilter}`);
+  }
+  if (filters.typeFilter && filters.typeFilter !== "all") {
+    filterDescParts.push(`Type: ${filters.typeFilter}`);
+  }
+  if (filters.statusFilter && filters.statusFilter !== "all") {
+    filterDescParts.push(`Status: ${filters.statusFilter}`);
+  }
+  const subtitle =
+    filterDescParts.length > 0
+      ? `Filtered By: ${filterDescParts.join("  |  ")}  |  Total Faculty: ${teachersList.length}`
+      : `All Faculty Directory & Payroll Status  |  Total Faculty: ${teachersList.length}`;
+
+  let y = drawSchoolHeader(doc, "Faculty Directory & Monthly Payroll Register", subtitle);
+
+  const totalTeachers = teachersList.length;
+  const activeCount = teachersList.filter((t) => String(t.status || "Active").toLowerCase() === "active").length;
+  const fullTimeCount = teachersList.filter((t) => String(t.employmentType || t.type || "").toLowerCase() === "full-time").length;
+  const paidCount = teachersList.filter((t) => String(t.salaryStatus || "Paid").toLowerCase() === "paid").length;
+  const totalMonthlyPayroll = teachersList.reduce((sum, t) => sum + (Number(t.salary) || 0), 0);
+
+  const boxW = (pageWidth - 44) / 5;
+  const stats = [
+    { label: "TOTAL FACULTY", val: totalTeachers, color: [30, 41, 59] },
+    { label: "ACTIVE FACULTY", val: activeCount, color: [37, 99, 235] },
+    { label: "FULL-TIME STAFF", val: fullTimeCount, color: [22, 163, 74] },
+    { label: "SALARY PAID", val: `${paidCount} / ${totalTeachers}`, color: [217, 119, 6] },
+    { label: "MONTHLY PAYROLL", val: `Rs. ${totalMonthlyPayroll.toLocaleString()}`, color: [79, 70, 229] },
+  ];
+
+  stats.forEach((st, i) => {
+    const bx = 14 + i * (boxW + 4);
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(203, 213, 225);
+    doc.roundedRect(bx, y, boxW, 16, 2, 2, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text(st.label, bx + boxW / 2, y + 6, { align: "center" });
+    doc.setFontSize(10.5);
+    doc.setTextColor(...st.color);
+    doc.text(String(st.val), bx + boxW / 2, y + 13, { align: "center" });
+  });
+
+  y += 22;
+
+  autoTable(doc, {
+    startY: y,
+    head: [
+      [
+        "S.No",
+        "Emp ID",
+        "Teacher Name",
+        "Department & Subject",
+        "Qualification & Exp",
+        "Assigned Classes",
+        "Contact",
+        "Type",
+        "Net Salary (Rs.)",
+        "Payroll",
+        "Status",
+      ],
+    ],
+    body: teachersList.map((t, idx) => [
+      idx + 1,
+      t.employeeId || `EMP-${t.id}`,
+      t.fullName || t.name || "—",
+      `${t.department || "General"} · ${t.subject || "—"}`,
+      `${t.qualification || "—"} (${t.experience || 0}y)`,
+      (t.classes || []).length > 0 ? t.classes.map((c) => `Class ${c}`).join(", ") : "—",
+      t.phone || "—",
+      t.employmentType || t.type || "Full-time",
+      `Rs. ${Number(t.salary || 0).toLocaleString()}`,
+      (t.salaryStatus || "Paid").toUpperCase(),
+      (t.status || "Active").toUpperCase(),
+    ]),
+    theme: "grid",
+    headStyles: {
+      fillColor: [30, 41, 59],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize: 8,
+      halign: "center",
+    },
+    bodyStyles: {
+      fontSize: 8,
+      textColor: [15, 23, 42],
+      cellPadding: 2.8,
+    },
+    columnStyles: {
+      0: { halign: "center", cellWidth: 11 },
+      1: { halign: "center", cellWidth: 20, fontStyle: "bold" },
+      2: { halign: "left", fontStyle: "bold" },
+      8: { halign: "right", fontStyle: "bold" },
+      9: { halign: "center", fontStyle: "bold" },
+      10: { halign: "center" },
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 14, [
+    "HR Coordinator",
+    "Accounts Officer",
+    "Principal",
+  ]);
+
+  doc.save(`Faculty_Directory_Payroll_Register.pdf`);
+}
+
+/**
+ * 7. Download Teacher Monthly Salary Slip PDF
+ */
+export function downloadTeacherSalarySlipPDF(salary, teacherOverride = null) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const teacherInfo = teacherOverride || salary?.teacherId || {};
+  const teacherName = teacherInfo.fullName || teacherInfo.name || "Teacher";
+  const empId = teacherInfo.employeeId || `EMP-${teacherInfo.id || "101"}`;
+  const designation = teacherInfo.designation || "Faculty Member";
+  const department = teacherInfo.department || "Academics";
+  const subject = teacherInfo.subject || "—";
+  const cnic = teacherInfo.cnic || "—";
+  const bankName = teacherInfo.bankName || "—";
+  const bankAcc = teacherInfo.bankAccountNo || "—";
+
+  const slipNo = `SLP-${String(salary?.id || "01").toUpperCase()}-${String(salary?.month || "SAL")
+    .slice(0, 3)
+    .toUpperCase()}-${salary?.year || "2026"}`;
+  const isPaid = String(salary?.status || "Paid").toLowerCase() === "paid";
+
+  let y = drawSchoolHeader(
+    doc,
+    `Official Faculty Salary Slip — ${salary?.month || ""} ${salary?.year || "2026"}`,
+    `Slip No: ${slipNo}   |   Payment Date: ${salary?.paymentDate || new Date().toISOString().split("T")[0]}`
+  );
+
+  // Faculty Info Box
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(14, y, pageWidth - 28, 36, 2, 2, "FD");
+
+  doc.setFontSize(9);
+  const leftX = 18;
+  const rightX = pageWidth / 2 + 4;
+
+  const drawField = (label, value, x, rowY) => {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(71, 85, 105);
+    doc.text(`${label}:`, x, rowY);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(value || "—"), x + 34, rowY);
+  };
+
+  drawField("Employee Name", teacherName, leftX, y + 8);
+  drawField("Employee ID", empId, leftX, y + 16);
+  drawField("Designation", designation, leftX, y + 24);
+  drawField("CNIC Number", cnic, leftX, y + 32);
+
+  drawField("Department", `${department} (${subject})`, rightX, y + 8);
+  drawField("Payment Mode", salary?.paymentMethod || "Bank Transfer", rightX, y + 16);
+  drawField("Bank & A/C", `${bankName} ${bankAcc}`, rightX, y + 24);
+  drawField("Payroll Status", (salary?.status || "Paid").toUpperCase(), rightX, y + 32);
+
+  y += 42;
+
+  const basic = Number(salary?.basicSalary || salary?.netAmount || 0);
+  const allowances = Number(salary?.allowances || 0);
+  const bonus = Number(salary?.bonus || 0);
+  const deductions = Number(salary?.deductions || 0);
+  const gross = basic + allowances + bonus;
+  const net = Number(salary?.netAmount || salary?.amount || Math.max(0, gross - deductions));
+
+  autoTable(doc, {
+    startY: y,
+    head: [["S.No", "Compensation & Deduction Head", "Category", "Amount (Rs.)"]],
+    body: [
+      ["1", "Basic Monthly Salary", "Earnings (+)", `Rs. ${basic.toLocaleString()}`],
+      ["2", "House Rent / Medical / Conveyance Allowances", "Earnings (+)", `Rs. ${allowances.toLocaleString()}`],
+      ["3", "Performance Bonus / Extra Duty Allowance", "Earnings (+)", `Rs. ${bonus.toLocaleString()}`],
+      ["4", "Gross Earnings", "Subtotal", `Rs. ${gross.toLocaleString()}`],
+      ["5", "Tax / Provident Fund / Leave Deductions", "Deductions (-)", `Rs. ${deductions.toLocaleString()}`],
+      ["6", "Net Payable / Disbursed Salary", "NET PAYABLE", `Rs. ${net.toLocaleString()}`],
+    ],
+    theme: "grid",
+    headStyles: {
+      fillColor: [30, 41, 59],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize: 9,
+      halign: "center",
+    },
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [15, 23, 42],
+      cellPadding: 4,
+    },
+    columnStyles: {
+      0: { halign: "center", cellWidth: 16 },
+      1: { halign: "left" },
+      2: { halign: "center", cellWidth: 36, fontStyle: "bold" },
+      3: { halign: "right", cellWidth: 40, fontStyle: "bold" },
+    },
+    didParseCell: (data) => {
+      if (data.section === "body" && data.row.index === 5) {
+        data.cell.styles.fillColor = isPaid ? [240, 253, 244] : [254, 252, 232];
+        data.cell.styles.textColor = isPaid ? [22, 163, 74] : [217, 119, 6];
+        data.cell.styles.fontStyle = "bold";
+      }
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+
+  if (salary?.remarks || salary?.transactionRef) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(
+      `Transaction Ref: ${salary?.transactionRef || "N/A"}   |   Remarks: ${salary?.remarks || "—"}`,
+      14,
+      y
+    );
+  }
+
+  drawSignatureFooter(doc, y + 18, ["Employee Signature", "Finance Manager", "Principal"]);
+
+  doc.save(`Salary_Slip_${sanitizeFilename(teacherName)}_${sanitizeFilename(salary?.month || "Month")}.pdf`);
+}
+
+/**
+ * 8. Download Teacher Full Salary Statement PDF
+ */
+export function downloadTeacherSalaryStatementPDF(teacher, salaryRecords = []) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const teacherName = teacher?.fullName || teacher?.name || "Teacher";
+  let y = drawSchoolHeader(
+    doc,
+    "Faculty Annual Salary & Payroll Statement",
+    `Employee: ${teacherName} (${teacher?.employeeId || "EMP"})   |   Department: ${teacher?.department || "Academics"}`
+  );
+
+  const totalPaid = salaryRecords
+    .filter((s) => String(s.status || "").toLowerCase() === "paid")
+    .reduce((acc, s) => acc + Number(s.netAmount || s.amount || 0), 0);
+  const totalPending = salaryRecords
+    .filter((s) => String(s.status || "").toLowerCase() === "pending")
+    .reduce((acc, s) => acc + Number(s.netAmount || s.amount || 0), 0);
+
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(14, y, pageWidth - 28, 20, 2, 2, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`Monthly Package: Rs. ${Number(teacher?.salary || 0).toLocaleString()}`, 20, y + 12);
+  doc.setTextColor(22, 163, 74);
+  doc.text(`Total Disbursed: Rs. ${totalPaid.toLocaleString()}`, pageWidth / 2 - 20, y + 12);
+  doc.setTextColor(217, 119, 6);
+  doc.text(`Pending Dues: Rs. ${totalPending.toLocaleString()}`, pageWidth - 75, y + 12);
+
+  y += 26;
+
+  autoTable(doc, {
+    startY: y,
+    head: [["S.No", "Month & Year", "Basic", "Allowances", "Bonus", "Deductions", "Net Salary", "Payment Date", "Status"]],
+    body: salaryRecords.map((s, idx) => [
+      idx + 1,
+      `${s.month} ${s.year || "2026"}`,
+      `Rs. ${Number(s.basicSalary || 0).toLocaleString()}`,
+      `Rs. ${Number(s.allowances || 0).toLocaleString()}`,
+      `Rs. ${Number(s.bonus || 0).toLocaleString()}`,
+      `Rs. ${Number(s.deductions || 0).toLocaleString()}`,
+      `Rs. ${Number(s.netAmount || s.amount || 0).toLocaleString()}`,
+      s.paymentDate || "—",
+      (s.status || "Paid").toUpperCase(),
+    ]),
+    theme: "grid",
+    headStyles: {
+      fillColor: [30, 41, 59],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize: 8.5,
+      halign: "center",
+    },
+    bodyStyles: {
+      fontSize: 8.5,
+      textColor: [15, 23, 42],
+      cellPadding: 3.5,
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 16, [
+    "Faculty Member",
+    "Accounts Officer",
+    "Principal",
+  ]);
+
+  doc.save(`Salary_Statement_${sanitizeFilename(teacherName)}.pdf`);
+}
+
+/**
+ * 9. Download Teacher Profile & Timetable Dossier PDF
+ */
+export function downloadTeacherProfilePDF(teacher) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const teacherName = teacher?.fullName || teacher?.name || "Teacher";
+
+  let y = drawSchoolHeader(
+    doc,
+    "Official Faculty Service Profile & Dossier",
+    `Employee ID: ${teacher?.employeeId || "EMP"}   |   Status: ${teacher?.status || "Active"}   |   Joined: ${teacher?.joiningDate || "—"}`
+  );
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Field", "Details", "Field", "Details"]],
+    body: [
+      ["Full Name", teacherName, "Father / Spouse", teacher?.fatherOrSpouseName || "—"],
+      ["Designation", teacher?.designation || "—", "Department", teacher?.department || "—"],
+      ["Primary Subject", teacher?.subject || "—", "Other Subjects", (teacher?.secondarySubjects || []).join(", ") || "—"],
+      ["Qualification", teacher?.qualification || "—", "Specialization", teacher?.specialization || "—"],
+      ["University", teacher?.university || "—", "Experience", `${teacher?.experience || 0} Years`],
+      ["CNIC No", teacher?.cnic || "—", "Date of Birth", teacher?.dob || "—"],
+      ["Phone", teacher?.phone || "—", "Email", teacher?.email || "—"],
+      ["Assigned Classes", (teacher?.classes || []).map((c) => `Class ${c}`).join(", ") || "—", "Class Teacher Of", teacher?.classTeacherOf || "—"],
+      ["Employment Type", teacher?.employmentType || teacher?.type || "Full-time", "Net Monthly Salary", `Rs. ${Number(teacher?.salary || 0).toLocaleString()}`],
+      ["Bank Name", teacher?.bankName || "—", "Account / IBAN", teacher?.bankAccountNo || teacher?.iban || "—"],
+      ["Address", teacher?.address || "—", "City", teacher?.city || "Lahore"],
+    ],
+    theme: "grid",
+    headStyles: {
+      fillColor: [30, 41, 59],
+      textColor: [255, 255, 255],
+      fontSize: 8.5,
+    },
+    bodyStyles: {
+      fontSize: 8.5,
+      cellPadding: 3.2,
+    },
+    columnStyles: {
+      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 35 },
+      1: { cellWidth: 56 },
+      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 35 },
+      3: { cellWidth: 56 },
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+
+  if (Array.isArray(teacher?.schedule) && teacher.schedule.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text("ASSIGNED WEEKLY TEACHING SCHEDULE", 14, y);
+    y += 4;
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Day", "Period", "Time", "Class & Section", "Subject", "Room"]],
+      body: teacher.schedule.map((slot) => [
+        slot.day || "—",
+        slot.period || "—",
+        `${slot.startTime || ""} - ${slot.endTime || ""}`,
+        `Class ${slot.className || "—"}-${slot.section || "A"}`,
+        slot.subject || teacher?.subject || "—",
+        slot.room || "—",
+      ]),
+      theme: "grid",
+      headStyles: {
+        fillColor: [79, 70, 229],
+        textColor: [255, 255, 255],
+        fontSize: 8.5,
+      },
+      bodyStyles: {
+        fontSize: 8.5,
+        cellPadding: 3,
+      },
+      margin: { left: 14, right: 14 },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  drawSignatureFooter(doc, y + 10, ["Faculty Signature", "HR Department", "Principal"]);
+  doc.save(`Teacher_Profile_${sanitizeFilename(teacherName)}.pdf`);
+}
+
+

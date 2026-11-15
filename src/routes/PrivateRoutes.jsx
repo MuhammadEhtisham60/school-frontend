@@ -8,6 +8,7 @@ import {
 } from "@/pages/Management/Students";
 import {
   TeachersPage,
+  TeacherDetailsPage,
   AccountantPage,
   AdminsPage,
   UsersPage,
@@ -53,6 +54,10 @@ export const privateRoutes = [
       {
         path: "/teachers",
         element: <TeachersPage />,
+      },
+      {
+        path: "/teachers/details/:id",
+        element: <TeacherDetailsPage />,
       },
       {
         path: "/admins",
