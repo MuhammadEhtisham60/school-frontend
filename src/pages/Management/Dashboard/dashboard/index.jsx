@@ -6,6 +6,8 @@ import {
   FeeCollectionChart,
   RecentActivityCard,
   TeacherDistributionChart,
+  UpcomingEventsCard,
+  RecentNoticesCard,
 } from "./subcompoenets";
 
 function Dashboard() {
@@ -14,6 +16,8 @@ function Dashboard() {
       <DashboardHeader />
 
       <DashboardKpiCards />
+
+
 
       <div className="grid gap-4 lg:grid-cols-3">
         <AdmissionsTrendsChart />
@@ -26,6 +30,10 @@ function Dashboard() {
       </div>
 
       <TeacherDistributionChart />
+            <div className="grid gap-4 lg:grid-cols-2">
+        <UpcomingEventsCard />
+        <RecentNoticesCard />
+      </div>
     </div>
   );
 }

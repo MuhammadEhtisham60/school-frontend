@@ -5,4 +5,5 @@ export { UserRolesChart } from "./UserRolesChart";
 export { FeeCollectionChart } from "./FeeCollectionChart";
 export { RecentActivityCard } from "./RecentActivityCard";
 export { TeacherDistributionChart } from "./TeacherDistributionChart";
-
+export { UpcomingEventsCard } from "./UpcomingEventsCard";
+export { RecentNoticesCard } from "./RecentNoticesCard";

@@ -53,6 +53,8 @@ export const baseApi = createApi({
     "TeacherSalary",
     "TeacherLeave",
     "TeacherAttendance",
+    "SchoolEvent",
+    "Notice",
   ],
   endpoints: () => ({}),
 });

@@ -20,7 +20,9 @@ import {
   LibraryPage,
   PaperCollectionPage,
   EventCalendarPage,
+  EventDetailsPage,
   NoticePage,
+  NoticeDetailsPage,
   ReportsPage,
 } from "@/pages/Management/Resources";
 import { FeesPage } from "@/pages/Management/Finance";
@@ -116,8 +118,16 @@ export const privateRoutes = [
         element: <NoticePage />,
       },
       {
+        path: "/notice/:id",
+        element: <NoticeDetailsPage />,
+      },
+      {
         path: "/event-calendar",
         element: <EventCalendarPage />,
+      },
+      {
+        path: "/event-calendar/:id",
+        element: <EventDetailsPage />,
       },
       {
         path: "/reports",
