@@ -1,3 +1,5 @@
+import { isTokenValid } from "@/store/slices/authSlice";
+
 let BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api";
 if (BASE_URL.endsWith("/")) {
   BASE_URL = BASE_URL.slice(0, -1);
@@ -5,9 +7,10 @@ if (BASE_URL.endsWith("/")) {
 
 const getAuthHeaders = (customHeaders = {}) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const valid = token && isTokenValid(token);
   return {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(valid ? { Authorization: `Bearer ${token}` } : {}),
     ...customHeaders,
   };
 };
@@ -17,7 +20,16 @@ const handleResponse = async (response) => {
   const data = isJson ? await response.json() : null;
 
   if (!response.ok) {
-    const errorMsg = data?.message || response.statusText || "An error occurred";
+    if (response.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("tokenExpiresAt");
+      localStorage.removeItem("user");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    const errorMsg = data?.message || data?.detail || response.statusText || "An error occurred";
     const error = new Error(errorMsg);
     error.status = response.status;
     error.data = data;

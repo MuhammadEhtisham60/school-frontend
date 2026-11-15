@@ -1,4 +1,5 @@
 import { baseApi } from "../index";
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
@@ -8,11 +9,23 @@ export const authApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
-    signup: builder.mutation({
-      query: (userData) => ({
-        url: "auth/signup",
+    logoutUser: builder.mutation({
+      query: () => ({
+        url: "auth/logout",
         method: "POST",
-        body: userData,
+      }),
+    }),
+    getMe: builder.query({
+      query: () => ({
+        url: "auth/me",
+        method: "GET",
+      }),
+    }),
+    changePassword: builder.mutation({
+      query: (body) => ({
+        url: "auth/change-password",
+        method: "POST",
+        body,
       }),
     }),
     forgotPassword: builder.mutation({
@@ -45,9 +58,12 @@ export const authApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
 export const {
   useLoginMutation,
-  useSignupMutation,
+  useLogoutUserMutation,
+  useGetMeQuery,
+  useChangePasswordMutation,
   useForgotPasswordMutation,
   useVerifyOtpMutation,
   useResendOtpMutation,

@@ -1,6 +1,6 @@
 import React from "react";
+import { Navigate } from "react-router-dom";
 import LoginPage from "@/pages/auth/login";
-import SignupPage from "@/pages/auth/signup";
 import ForgotPasswordFlow from "@/pages/auth/ForgotPasswordFlow";
 
 export const authRoutes = [
@@ -10,7 +10,7 @@ export const authRoutes = [
   },
   {
     path: "/signup",
-    element: <SignupPage />,
+    element: <Navigate to="/login" replace />,
   },
   {
     path: "/forgot-password",

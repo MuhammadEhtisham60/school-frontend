@@ -1,34 +1,46 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { mockBaseQuery } from "./mockFallback";
+import { logout, isTokenValid } from "@/store/slices/authSlice";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/",
-  prepareHeaders: (headers) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+  prepareHeaders: (headers, { getState }) => {
+    const token = getState()?.auth?.token || localStorage.getItem("token");
+    if (token && isTokenValid(token)) {
+      headers.set("Authorization", `Bearer ${token}`);
     }
     return headers;
   },
 });
 
-const baseQueryWithFallback = async (args, api, extraOptions) => {
-  const result = await rawBaseQuery(args, api, extraOptions);
-  if (
-    result.error &&
-    (result.error.status === "FETCH_ERROR" ||
-      result.error.status === "PARSING_ERROR" ||
-      (typeof result.error.status === "number" && result.error.status >= 500) ||
-      (typeof result.error.originalStatus === "number" && result.error.originalStatus >= 500))
-  ) {
-    return mockBaseQuery(args, api, extraOptions);
+const baseQueryWithAuth = async (args, api, extraOptions) => {
+  const url = typeof args === "string" ? args : args?.url || "";
+  const isLoginRequest = url.includes("auth/login");
+
+  if (!isLoginRequest) {
+    const token = api.getState()?.auth?.token || localStorage.getItem("token");
+    if (!token || !isTokenValid(token)) {
+      api.dispatch(logout());
+      return {
+        error: {
+          status: 401,
+          data: { message: "Authentication required. Please sign in." },
+        },
+      };
+    }
   }
+
+  const result = await rawBaseQuery(args, api, extraOptions);
+
+  if (result.error && result.error.status === 401 && !isLoginRequest) {
+    api.dispatch(logout());
+  }
+
   return result;
 };
 
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithFallback,
+  baseQuery: baseQueryWithAuth,
   tagTypes: [
     "Student",
     "StudentFees",

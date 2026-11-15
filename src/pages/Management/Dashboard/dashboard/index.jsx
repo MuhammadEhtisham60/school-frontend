@@ -38,6 +38,7 @@ import {
   recentActivity,
 } from "@/data/mock-data";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const PIE_COLORS = [
   "oklch(0.55 0.22 280)",
@@ -46,31 +47,42 @@ const PIE_COLORS = [
   "oklch(0.72 0.16 155)",
 ];
 function Dashboard() {
+  const user = useSelector((state) => state.auth.user);
+  const userName =
+    user?.profile?.name ||
+    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+    user?.email?.split("@")[0] ||
+    "User";
+
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Welcome back"
-        title="School Dashboard"
-        description="Real-time insights across admissions, academics, finance and people."
-        actions={
-          <>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" /> Export
-            </Button>
-            <Button
-              asChild
-              className="gap-2 gradient-primary text-primary-foreground shadow-glow border-0"
-            >
-              <Link to="/admission">
-                <UserPlus className="h-4 w-4" /> New Admission
-              </Link>
-            </Button>
-          </>
-        }
+        eyebrow="SCHOOL OVERVIEW · SESSION 2024–25"
+        title={`${greeting}, ${userName} ✦`}
+        // description="Real-time insights across admissions, academics, finance and people."
+        // actions={
+        //   <>
+        //     <Button variant="outline" className="gap-2">
+        //       <Download className="h-4 w-4" /> Export
+        //     </Button>
+        //     <Button
+        //       asChild
+        //       className="gap-2 gradient-primary text-primary-foreground shadow-glow border-0"
+        //     >
+        //       <Link to="/admission">
+        //         <UserPlus className="h-4 w-4" /> New Admission
+        //       </Link>
+        //     </Button>
+        //   </>
+        // }
       />
 
       {/* Hero banner */}
-      <Card className="relative overflow-hidden border-0 p-6 md:p-8 gradient-hero text-white shadow-glow">
+      {/* <Card className="relative overflow-hidden border-0 p-6 md:p-8 gradient-hero text-white shadow-glow">
         <div
           className="absolute inset-0 opacity-20 mix-blend-overlay"
           style={{
@@ -126,7 +138,7 @@ function Dashboard() {
             ))}
           </div>
         </div>
-      </Card>
+      </Card> */}
 
       {/* KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -136,7 +148,6 @@ function Dashboard() {
           icon={GraduationCap}
           trend={12}
           variant="primary"
-          sub="vs 1,112 last year"
         />
         <StatCard
           label="Total Teachers"
@@ -144,7 +155,6 @@ function Dashboard() {
           icon={BookOpen}
           trend={4}
           variant="info"
-          sub="6 new hires this term"
         />
         <StatCard
           label="Active Users"
@@ -152,7 +162,6 @@ function Dashboard() {
           icon={Users}
           trend={8}
           variant="success"
-          sub="across all roles"
         />
         <StatCard
           label="Fees Collected"
@@ -160,7 +169,6 @@ function Dashboard() {
           icon={Wallet}
           trend={-3}
           variant="warning"
-          sub="Aug 2024"
         />
       </div>
 

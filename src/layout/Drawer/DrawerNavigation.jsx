@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
+import { baseApi } from "@/services";
 import { Sidebar, useSidebar } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -100,7 +101,8 @@ export function DrawerNavigation() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    dispatch(baseApi.util.resetApiState());
+    navigate("/login", { replace: true });
   };
 
   return (
