@@ -38,6 +38,7 @@ import {
   recentActivity,
 } from "@/data/mock-data";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const PIE_COLORS = [
   "oklch(0.55 0.22 280)",
@@ -46,11 +47,22 @@ const PIE_COLORS = [
   "oklch(0.72 0.16 155)",
 ];
 function Dashboard() {
+  const user = useSelector((state) => state.auth.user);
+  const userName =
+    user?.profile?.name ||
+    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+    user?.email?.split("@")[0] ||
+    "User";
+
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Welcome back"
-        title="School Dashboard"
+        eyebrow="SCHOOL OVERVIEW · SESSION 2024–25"
+        title={`${greeting}, ${userName} ✦`}
         description="Real-time insights across admissions, academics, finance and people."
         actions={
           <>
@@ -70,7 +82,7 @@ function Dashboard() {
       />
 
       {/* Hero banner */}
-      <Card className="relative overflow-hidden border-0 p-6 md:p-8 gradient-hero text-white shadow-glow">
+      {/* <Card className="relative overflow-hidden border-0 p-6 md:p-8 gradient-hero text-white shadow-glow">
         <div
           className="absolute inset-0 opacity-20 mix-blend-overlay"
           style={{
@@ -126,7 +138,7 @@ function Dashboard() {
             ))}
           </div>
         </div>
-      </Card>
+      </Card> */}
 
       {/* KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
