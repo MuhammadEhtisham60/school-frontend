@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getThemeColors } from "@/utils/themeManager";
 
 const SCHOOL_NAME = "THE FORCE SCHOOL SYSTEM";
 const SCHOOL_TAGLINE = "Excellence in Academics, Character & Leadership";
@@ -25,11 +26,11 @@ function drawSchoolHeader(doc, title, subtitle = "") {
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // Header Banner
-  doc.setFillColor(30, 41, 59); // Slate-800
+  doc.setFillColor(...getThemeColors().bannerRgb); // Slate-800
   doc.rect(0, 0, pageWidth, 34, "F");
 
   // Accent Stripe
-  doc.setFillColor(79, 70, 229); // Indigo-600
+  doc.setFillColor(...getThemeColors().accentRgb); // Indigo-600
   doc.rect(0, 34, pageWidth, 2.5, "F");
 
   doc.setTextColor(255, 255, 255);
@@ -44,7 +45,7 @@ function drawSchoolHeader(doc, title, subtitle = "") {
   doc.text(SCHOOL_CONTACT, pageWidth / 2, 25, { align: "center" });
 
   // Document Title Pill
-  doc.setFillColor(241, 245, 249);
+  doc.setFillColor(...getThemeColors().softBgRgb);
   doc.setDrawColor(203, 213, 225);
   doc.roundedRect(14, 41, pageWidth - 28, subtitle ? 16 : 12, 2, 2, "FD");
 
@@ -175,7 +176,7 @@ export function downloadFeeReceiptPDF(fee, studentOverride = null) {
     ],
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 9,
@@ -278,7 +279,7 @@ export function downloadStudentFeeStatementPDF(student, feeRecords = []) {
   // Summary KPI Row
   const boxW = (pageWidth - 36) / 3;
   const kpis = [
-    { label: "TOTAL BILLED", val: `PKR ${totalBilled.toLocaleString()}`, color: [30, 41, 59] },
+    { label: "TOTAL BILLED", val: `PKR ${totalBilled.toLocaleString()}`, color: getThemeColors().bannerRgb },
     { label: "TOTAL PAID", val: `PKR ${totalPaid.toLocaleString()}`, color: [22, 163, 74] },
     { label: "BALANCE DUE", val: `PKR ${totalDue.toLocaleString()}`, color: totalDue > 0 ? [220, 38, 38] : [71, 85, 105] },
   ];
@@ -313,7 +314,7 @@ export function downloadStudentFeeStatementPDF(student, feeRecords = []) {
     ]),
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontSize: 8.5,
       fontStyle: "bold",
@@ -429,7 +430,7 @@ export function downloadTermResultCardPDF(record, termName, studentOverride = nu
     ],
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8.5,
@@ -452,7 +453,7 @@ export function downloadTermResultCardPDF(record, termName, studentOverride = nu
     },
     didParseCell: (data) => {
       if (data.row.index === subjects.length) {
-        data.cell.styles.fillColor = [241, 245, 249];
+        data.cell.styles.fillColor = getThemeColors().softBgRgb;
         data.cell.styles.fontStyle = "bold";
       }
     },
@@ -662,7 +663,7 @@ export function downloadCompleteThreeTermsResultCardPDF(record, studentOverride 
     ],
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 7.8,
@@ -688,7 +689,7 @@ export function downloadCompleteThreeTermsResultCardPDF(record, studentOverride 
     },
     didParseCell: (data) => {
       if (data.row.index === subjectRows.length) {
-        data.cell.styles.fillColor = [241, 245, 249];
+        data.cell.styles.fillColor = getThemeColors().softBgRgb;
         data.cell.styles.fontStyle = "bold";
       }
     },
@@ -734,7 +735,7 @@ export function downloadCompleteThreeTermsResultCardPDF(record, studentOverride 
     body: termSummaryRows,
     theme: "grid",
     headStyles: {
-      fillColor: [79, 70, 229],
+      fillColor: getThemeColors().accentRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8,
@@ -756,7 +757,7 @@ export function downloadCompleteThreeTermsResultCardPDF(record, studentOverride 
     },
     didParseCell: (data) => {
       if (data.row.index === termSummaryRows.length - 1) {
-        data.cell.styles.fillColor = [238, 242, 255];
+        data.cell.styles.fillColor = getThemeColors().highlightRowRgb;
         data.cell.styles.fontStyle = "bold";
       }
     },
@@ -807,11 +808,11 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
   // Summary Strip
   const boxW = (pageWidth - 44) / 5;
   const stats = [
-    { label: "TOTAL STUDENTS", val: totalStudents, color: [30, 41, 59] },
+    { label: "TOTAL STUDENTS", val: totalStudents, color: getThemeColors().bannerRgb },
     { label: "ACTIVE STUDENTS", val: activeCount, color: [37, 99, 235] },
     { label: "FEES PAID", val: paidCount, color: [22, 163, 74] },
     { label: "FEES PENDING", val: pendingCount, color: [217, 119, 6] },
-    { label: "MONTHLY FEE SUM", val: `PKR ${totalMonthlyFee.toLocaleString()}`, color: [79, 70, 229] },
+    { label: "MONTHLY FEE SUM", val: `PKR ${totalMonthlyFee.toLocaleString()}`, color: getThemeColors().accentRgb },
   ];
 
   stats.forEach((st, i) => {
@@ -864,7 +865,7 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
     }),
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8.5,
@@ -948,11 +949,11 @@ export function downloadTeacherListPDF(teachersList = [], filters = {}) {
 
   const boxW = (pageWidth - 44) / 5;
   const stats = [
-    { label: "TOTAL FACULTY", val: totalTeachers, color: [30, 41, 59] },
+    { label: "TOTAL FACULTY", val: totalTeachers, color: getThemeColors().bannerRgb },
     { label: "ACTIVE FACULTY", val: activeCount, color: [37, 99, 235] },
     { label: "FULL-TIME STAFF", val: fullTimeCount, color: [22, 163, 74] },
     { label: "SALARY PAID", val: `${paidCount} / ${totalTeachers}`, color: [217, 119, 6] },
-    { label: "MONTHLY PAYROLL", val: `PKR ${totalMonthlyPayroll.toLocaleString()}`, color: [79, 70, 229] },
+    { label: "MONTHLY PAYROLL", val: `PKR ${totalMonthlyPayroll.toLocaleString()}`, color: getThemeColors().accentRgb },
   ];
 
   stats.forEach((st, i) => {
@@ -1003,7 +1004,7 @@ export function downloadTeacherListPDF(teachersList = [], filters = {}) {
     ]),
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8,
@@ -1112,7 +1113,7 @@ export function downloadTeacherSalarySlipPDF(salary, teacherOverride = null) {
     ],
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 9,
@@ -1208,7 +1209,7 @@ export function downloadTeacherSalaryStatementPDF(teacher, salaryRecords = []) {
     ]),
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8.5,
@@ -1262,7 +1263,7 @@ export function downloadTeacherProfilePDF(teacher) {
     ],
     theme: "grid",
     headStyles: {
-      fillColor: [30, 41, 59],
+      fillColor: getThemeColors().bannerRgb,
       textColor: [255, 255, 255],
       fontSize: 8.5,
     },
@@ -1301,7 +1302,7 @@ export function downloadTeacherProfilePDF(teacher) {
       ]),
       theme: "grid",
       headStyles: {
-        fillColor: [79, 70, 229],
+        fillColor: getThemeColors().accentRgb,
         textColor: [255, 255, 255],
         fontSize: 8.5,
       },
@@ -1339,7 +1340,7 @@ export function downloadSubjectsListPDF(subjects = [], subtitle = "Curriculum & 
       s.isActive === false ? "Inactive" : "Active",
     ]),
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
     margin: { left: 14, right: 14 },
   });
@@ -1381,7 +1382,7 @@ export function downloadSubjectDetailPDF(subject, routines = [], exams = []) {
       ["Description", subject?.description || "—"],
     ],
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8.5, cellPadding: 3 },
     columnStyles: { 0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 48 } },
     margin: { left: 14, right: 14 },
@@ -1407,7 +1408,7 @@ export function downloadSubjectDetailPDF(subject, routines = [], exams = []) {
         r.room || "—",
       ]),
       theme: "grid",
-      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 8.5 },
+      headStyles: { fillColor: getThemeColors().accentRgb, textColor: [255, 255, 255], fontSize: 8.5 },
       bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
       margin: { left: 14, right: 14 },
     });
@@ -1433,7 +1434,7 @@ export function downloadSubjectDetailPDF(subject, routines = [], exams = []) {
         ex.status || "Scheduled",
       ]),
       theme: "grid",
-      headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+      headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
       bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
       margin: { left: 14, right: 14 },
     });
@@ -1479,9 +1480,9 @@ export function downloadClassRoutinePDF(className, section, timeSlots = [], rout
     head,
     body,
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8, halign: "center" },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8, halign: "center" },
     bodyStyles: { fontSize: 7.5, cellPadding: 2.5, halign: "center", valign: "middle" },
-    columnStyles: { 0: { fontStyle: "bold", fillColor: [241, 245, 249], halign: "left", cellWidth: 26 } },
+    columnStyles: { 0: { fontStyle: "bold", fillColor: getThemeColors().softBgRgb, halign: "left", cellWidth: 26 } },
     margin: { left: 14, right: 14 },
   });
 
@@ -1511,7 +1512,7 @@ export function downloadExamsListPDF(exams = [], subtitle = "Official Examinatio
       ex.status || "Scheduled",
     ]),
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8, cellPadding: 2.6 },
     margin: { left: 14, right: 14 },
   });
@@ -1546,7 +1547,7 @@ export function downloadExamDetailPDF(exam, students = []) {
       ["Instructions", exam?.instructions || "Standard examination rules apply.", "", ""],
     ],
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8.5, cellPadding: 3 },
     columnStyles: {
       0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 32 },
@@ -1578,7 +1579,7 @@ export function downloadExamDetailPDF(exam, students = []) {
         "",
       ]),
       theme: "grid",
-      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 8.5 },
+      headStyles: { fillColor: getThemeColors().accentRgb, textColor: [255, 255, 255], fontSize: 8.5 },
       bodyStyles: { fontSize: 8.5, cellPadding: 3 },
       margin: { left: 14, right: 14 },
     });
@@ -1611,7 +1612,7 @@ export function downloadResultsLedgerPDF(results = [], subtitle = "Academic Resu
       r.status || "—",
     ]),
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8, cellPadding: 2.6 },
     margin: { left: 14, right: 14 },
   });
@@ -1646,7 +1647,7 @@ export function downloadClassAttendancePDF(className, section, attDate, rows = [
       r.status === "Leave" ? r.leaveReason || "—" : "—",
     ]),
     theme: "grid",
-    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    headStyles: { fillColor: getThemeColors().bannerRgb, textColor: [255, 255, 255], fontSize: 8.5 },
     bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
     margin: { left: 14, right: 14 },
   });

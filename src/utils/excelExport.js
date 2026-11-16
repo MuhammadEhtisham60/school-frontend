@@ -1,3 +1,5 @@
+import { getThemeColors } from "@/utils/themeManager";
+
 function escapeHtml(val) {
   return String(val ?? "")
     .replace(/&/g, "&amp;")
@@ -23,16 +25,17 @@ export function downloadExcelFile({
   headers = [],
   rows = [],
 }) {
+  const t = getThemeColors();
   const safeSheet = escapeHtml(sheetName.slice(0, 31) || "Sheet1");
   const titleRow = title
-    ? `<tr><th colspan="${Math.max(headers.length, 1)}" style="font-size:14px;font-weight:bold;text-align:left;padding:8px;background:#1e293b;color:#ffffff;">${escapeHtml(title)}</th></tr>`
+    ? `<tr><th colspan="${Math.max(headers.length, 1)}" style="font-size:14px;font-weight:bold;text-align:left;padding:8px;background:${t.bannerHex};color:#ffffff;border-bottom:3px solid ${t.accentHex};">${escapeHtml(title)}</th></tr>`
     : "";
 
   const headerRow = headers.length
     ? `<tr>${headers
         .map(
           (h) =>
-            `<th style="font-weight:bold;text-align:left;padding:6px 8px;background:#e2e8f0;border:1px solid #cbd5e1;">${escapeHtml(h)}</th>`
+            `<th style="font-weight:bold;text-align:left;padding:6px 8px;background:${t.softBgHex};color:${t.inkHex};border:1px solid ${t.borderHex};">${escapeHtml(h)}</th>`
         )
         .join("")}</tr>`
     : "";
@@ -43,7 +46,7 @@ export function downloadExcelFile({
         `<tr>${row
           .map(
             (cell) =>
-              `<td style="padding:5px 8px;border:1px solid #cbd5e1;vertical-align:top;">${escapeHtml(cell)}</td>`
+              `<td style="padding:5px 8px;border:1px solid ${t.borderHex};color:${t.inkHex};vertical-align:top;">${escapeHtml(cell)}</td>`
           )
           .join("")}</tr>`
     )

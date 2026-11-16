@@ -26,7 +26,7 @@ function CollapsibleNavItem({ item, collapsed, isActive, pathname }) {
 
   useEffect(() => {
     if (inSection) setOpen(true);
-  }, [inSection, pathname]);
+  }, [inSection]);
 
   if (collapsed) {
     return (
@@ -65,7 +65,7 @@ function CollapsibleNavItem({ item, collapsed, isActive, pathname }) {
           >
             <Link
               to={item.url}
-              onClick={() => setOpen(true)}
+              onClick={() => setOpen((prev) => !prev)}
               className="flex items-center gap-3 w-full"
             >
               <item.icon className="h-4 w-4 shrink-0" />

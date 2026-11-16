@@ -239,9 +239,9 @@ export function TeacherDistributionChart() {
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="oklch(0.55 0.22 280)"
+                stroke="var(--chart-1)"
                 strokeWidth={3}
-                dot={{ r: 5, fill: "oklch(0.7 0.18 320)" }}
+                dot={{ r: 5, fill: "var(--chart-2)" }}
                 activeDot={{ r: 7 }}
               />
             </LineChart>

@@ -27,12 +27,12 @@ export function AdmissionsTrendsChart() {
         <AreaChart data={admissionTrends}>
           <defs>
             <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="oklch(0.55 0.22 280)" stopOpacity={0.5} />
-              <stop offset="100%" stopColor="oklch(0.55 0.22 280)" stopOpacity={0} />
+              <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.5} />
+              <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="oklch(0.7 0.18 320)" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="oklch(0.7 0.18 320)" stopOpacity={0} />
+              <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -48,14 +48,14 @@ export function AdmissionsTrendsChart() {
           <Area
             type="monotone"
             dataKey="enquiries"
-            stroke="oklch(0.7 0.18 320)"
+            stroke="var(--chart-2)"
             fill="url(#g2)"
             strokeWidth={2}
           />
           <Area
             type="monotone"
             dataKey="admissions"
-            stroke="oklch(0.55 0.22 280)"
+            stroke="var(--chart-1)"
             fill="url(#g1)"
             strokeWidth={2.5}
           />

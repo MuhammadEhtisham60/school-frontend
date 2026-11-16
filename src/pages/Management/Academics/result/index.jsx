@@ -536,19 +536,19 @@ function ResultPage() {
                         boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                       }}
                     />
-                    <Bar dataKey="average" fill="oklch(0.55 0.22 280)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="top" fill="oklch(0.7 0.18 320)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="average" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="top" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             )}
             <div className="flex items-center justify-center gap-6 mt-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-[oklch(0.55_0.22_280)]" />
+                <div className="h-3 w-3 rounded-full bg-[var(--chart-1)]" />
                 <span>Average Score</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-[oklch(0.7_0.18_320)]" />
+                <div className="h-3 w-3 rounded-full bg-[var(--chart-2)]" />
                 <span>Top Score</span>
               </div>
             </div>

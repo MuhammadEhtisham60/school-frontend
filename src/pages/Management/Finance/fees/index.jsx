@@ -382,7 +382,7 @@ function FeesPage() {
                 borderRadius: 12,
               }}
             />
-            <Bar dataKey="collected" fill="oklch(0.55 0.22 280)" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="collected" fill="var(--chart-1)" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>

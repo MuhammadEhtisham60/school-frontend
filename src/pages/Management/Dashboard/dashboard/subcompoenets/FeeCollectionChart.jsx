@@ -247,13 +247,13 @@ export function FeeCollectionChart() {
             <Bar
               dataKey="collected"
               name="Collected"
-              fill="oklch(0.55 0.22 280)"
+              fill="var(--chart-1)"
               radius={[8, 8, 0, 0]}
             />
             <Bar
               dataKey="pending"
               name="Pending"
-              fill="oklch(0.78 0.16 75)"
+              fill="var(--chart-3)"
               radius={[8, 8, 0, 0]}
             />
           </BarChart>
