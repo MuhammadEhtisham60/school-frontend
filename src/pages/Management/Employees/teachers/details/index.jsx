@@ -572,7 +572,7 @@ export default function TeacherDetailsPage() {
               <p>
                 Monthly Package:{" "}
                 <span className="text-primary font-bold">
-                  Rs. {Number(teacher.salary || 0).toLocaleString()}
+                  PKR {Number(teacher.salary || 0).toLocaleString()}
                 </span>
               </p>
             </div>
@@ -672,19 +672,19 @@ export default function TeacherDetailsPage() {
                 <DetailRow label="Employment Type" value={teacher.employmentType || teacher.type} />
                 <DetailRow
                   label="Basic Salary"
-                  value={`Rs. ${Number(teacher.basicSalary || teacher.salary || 0).toLocaleString()}`}
+                  value={`PKR ${Number(teacher.basicSalary || teacher.salary || 0).toLocaleString()}`}
                 />
                 <DetailRow
                   label="Allowances"
-                  value={`Rs. ${Number(teacher.allowances || 0).toLocaleString()}`}
+                  value={`PKR ${Number(teacher.allowances || 0).toLocaleString()}`}
                 />
                 <DetailRow
                   label="Deductions"
-                  value={`Rs. ${Number(teacher.deductions || 0).toLocaleString()}`}
+                  value={`PKR ${Number(teacher.deductions || 0).toLocaleString()}`}
                 />
                 <DetailRow
                   label="Net Monthly Salary"
-                  value={`Rs. ${Number(teacher.salary || 0).toLocaleString()}`}
+                  value={`PKR ${Number(teacher.salary || 0).toLocaleString()}`}
                 />
                 <DetailRow label="Payment Mode" value={teacher.paymentMethod} />
                 <DetailRow label="Bank Name" value={teacher.bankName} />
@@ -955,11 +955,11 @@ export default function TeacherDetailsPage() {
                     Monthly Net Package
                   </p>
                   <p className="text-xl font-bold mt-1 text-primary">
-                    Rs. {Number(teacher.salary || 0).toLocaleString()}
+                    PKR {Number(teacher.salary || 0).toLocaleString()}
                   </p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Basic: Rs. {Number(teacher.basicSalary || teacher.salary || 0).toLocaleString()} ·
-                    Allow: Rs. {Number(teacher.allowances || 0).toLocaleString()}
+                    Basic: PKR {Number(teacher.basicSalary || teacher.salary || 0).toLocaleString()} ·
+                    Allow: PKR {Number(teacher.allowances || 0).toLocaleString()}
                   </p>
                 </div>
                 <div className="p-4 rounded-xl border bg-muted/20">
@@ -967,7 +967,7 @@ export default function TeacherDetailsPage() {
                     Total Disbursed (Paid)
                   </p>
                   <p className="text-xl font-bold mt-1 text-success">
-                    Rs. {totalDisbursed.toLocaleString()}
+                    PKR {totalDisbursed.toLocaleString()}
                   </p>
                 </div>
                 <div className="p-4 rounded-xl border bg-muted/20">
@@ -979,7 +979,7 @@ export default function TeacherDetailsPage() {
                       totalPendingSalary > 0 ? "text-destructive" : "text-muted-foreground"
                     }`}
                   >
-                    Rs. {totalPendingSalary.toLocaleString()}
+                    PKR {totalPendingSalary.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -1017,18 +1017,18 @@ export default function TeacherDetailsPage() {
                             <td className="p-3 font-semibold">
                               {sal.month} {sal.year}
                             </td>
-                            <td className="p-3">Rs. {Number(sal.basicSalary || 0).toLocaleString()}</td>
+                            <td className="p-3">PKR {Number(sal.basicSalary || 0).toLocaleString()}</td>
                             <td className="p-3 text-xs">
-                              +Rs. {Number(sal.allowances || 0).toLocaleString()}
+                              +PKR {Number(sal.allowances || 0).toLocaleString()}
                             </td>
                             <td className="p-3 text-xs text-success">
-                              +Rs. {Number(sal.bonus || 0).toLocaleString()}
+                              +PKR {Number(sal.bonus || 0).toLocaleString()}
                             </td>
                             <td className="p-3 text-xs text-destructive">
-                              -Rs. {Number(sal.deductions || 0).toLocaleString()}
+                              -PKR {Number(sal.deductions || 0).toLocaleString()}
                             </td>
                             <td className="p-3 font-bold text-primary">
-                              Rs. {Number(sal.netAmount || sal.amount || 0).toLocaleString()}
+                              PKR {Number(sal.netAmount || sal.amount || 0).toLocaleString()}
                             </td>
                             <td className="p-3 text-xs text-muted-foreground">
                               {sal.paymentDate || "—"}
@@ -1452,7 +1452,7 @@ export default function TeacherDetailsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Basic Salary (Rs.)</Label>
+                <Label>Basic Salary (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.basicSalary}
@@ -1460,7 +1460,7 @@ export default function TeacherDetailsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Allowances (Rs.)</Label>
+                <Label>Allowances (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.allowances}
@@ -1468,7 +1468,7 @@ export default function TeacherDetailsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Bonus / Extra Duty (Rs.)</Label>
+                <Label>Bonus / Extra Duty (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.bonus}
@@ -1476,7 +1476,7 @@ export default function TeacherDetailsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Deductions (Rs.)</Label>
+                <Label>Deductions (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.deductions}
@@ -1484,7 +1484,7 @@ export default function TeacherDetailsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Net Payable (Rs.)</Label>
+                <Label>Net Payable (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.netAmount}

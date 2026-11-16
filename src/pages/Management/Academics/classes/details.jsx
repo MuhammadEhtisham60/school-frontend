@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { PageHeader } from "@/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ import {
   Pencil,
   X,
   Download,
+  CalendarCheck,
 } from "lucide-react";
 import { useGetClassByIdQuery, useUpdateClassMutation } from "@/services/private/classService";
 import { useGetStudentsQuery } from "@/services/private/studentService";
@@ -223,9 +224,19 @@ export default function ClassDetailsPage() {
         title={`${classData.name}`}
         description={`Detailed record of enrolled students and assigned subjects for ${classData.name}.`}
         actions={
-          <Button onClick={handleOpenEdit} variant="outline" className="gap-1.5 h-9 text-xs font-semibold">
-            <Pencil className="h-4 w-4" /> Edit Class
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              asChild
+              className="gap-1.5 h-9 text-xs font-semibold gradient-primary text-primary-foreground border-0 shadow-glow"
+            >
+              <Link to={`/classes/${classData.id}/attendance`}>
+                <CalendarCheck className="h-4 w-4" /> Attendance
+              </Link>
+            </Button>
+            <Button onClick={handleOpenEdit} variant="outline" className="gap-1.5 h-9 text-xs font-semibold">
+              <Pencil className="h-4 w-4" /> Edit Class
+            </Button>
+          </div>
         }
       />
 

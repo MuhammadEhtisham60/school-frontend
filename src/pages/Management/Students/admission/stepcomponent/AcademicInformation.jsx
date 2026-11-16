@@ -69,7 +69,7 @@ export function AcademicInformation() {
       <FormikText
         name="class_fees"
         type="number"
-        label="Monthly Class Fees (Rs.)"
+        label="Monthly Class Fees (PKR)"
         placeholder="e.g. 5000"
         required
       />

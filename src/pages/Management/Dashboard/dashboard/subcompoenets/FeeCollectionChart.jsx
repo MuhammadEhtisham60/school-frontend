@@ -177,8 +177,8 @@ export function FeeCollectionChart() {
           <div>
             <h3 className="font-semibold text-lg">Fee Collection</h3>
             <p className="text-sm text-muted-foreground">
-              Collected vs pending (Rs.) · Paid: Rs. {totalCollected.toLocaleString()} · Pending:
-              Rs. {totalPending.toLocaleString()}
+              Collected vs pending (PKR) · Paid: PKR {totalCollected.toLocaleString()} · Pending:
+              PKR {totalPending.toLocaleString()}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -236,7 +236,7 @@ export function FeeCollectionChart() {
             <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
             <YAxis stroke="var(--muted-foreground)" fontSize={12} />
             <Tooltip
-              formatter={(value) => `Rs. ${Number(value).toLocaleString()}`}
+              formatter={(value) => `PKR ${Number(value).toLocaleString()}`}
               contentStyle={{
                 background: "var(--card)",
                 border: "1px solid var(--border)",

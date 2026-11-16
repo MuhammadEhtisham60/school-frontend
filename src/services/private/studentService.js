@@ -92,6 +92,22 @@ export const studentApi = baseApi.injectEndpoints({
       providesTags: [{ type: "Student", id: "LIST" }],
       keepUnusedDataFor: 0,
     }),
+    getStudentAttendance: builder.query({
+      query: (params) => ({
+        url: "student-attendance",
+        method: "GET",
+        params,
+      }),
+      providesTags: [{ type: "StudentAttendance", id: "LIST" }],
+    }),
+    saveStudentAttendance: builder.mutation({
+      query: (body) => ({
+        url: "student-attendance",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "StudentAttendance", id: "LIST" }],
+    }),
   }),
 });
 
@@ -105,4 +121,6 @@ export const {
   useUpdateStudentFeeMutation,
   usePayStudentFeeMutation,
   useGetNextRollNoQuery,
+  useGetStudentAttendanceQuery,
+  useSaveStudentAttendanceMutation,
 } = studentApi;

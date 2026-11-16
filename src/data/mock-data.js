@@ -234,7 +234,7 @@ export const feeCollection = [
 ];
 export const recentActivity = [
   { id: 1, type: "admission", text: "New admission: Hamza Iqbal — Class 8", time: "2 min ago" },
-  { id: 2, type: "fee", text: "Fee paid: Ayesha Noor — Rs. 12,500", time: "18 min ago" },
+  { id: 2, type: "fee", text: "Fee paid: Ayesha Noor — PKR 12,500", time: "18 min ago" },
   { id: 3, type: "teacher", text: "Imran Sheikh marked attendance for 10-A", time: "1 hr ago" },
   { id: 4, type: "user", text: "Admin Saima updated permissions", time: "3 hr ago" },
   { id: 5, type: "admission", text: "New admission: Fatima Zahra — Class 9", time: "5 hr ago" },

@@ -689,7 +689,7 @@ export default function StudentDetailsPage() {
                         Total Billed
                       </p>
                       <p className="text-xl font-bold mt-1 text-primary">
-                        Rs. {totalBilled.toLocaleString()}
+                        PKR {totalBilled.toLocaleString()}
                       </p>
                     </div>
                     <div className="p-4 rounded-xl border bg-muted/20">
@@ -697,7 +697,7 @@ export default function StudentDetailsPage() {
                         Total Paid
                       </p>
                       <p className="text-xl font-bold mt-1 text-success">
-                        Rs. {totalPaid.toLocaleString()}
+                        PKR {totalPaid.toLocaleString()}
                       </p>
                     </div>
                     <div className="p-4 rounded-xl border bg-muted/20">
@@ -707,7 +707,7 @@ export default function StudentDetailsPage() {
                       <p
                         className={`text-xl font-bold mt-1 ${totalDue > 0 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}
                       >
-                        Rs. {totalDue.toLocaleString()}
+                        PKR {totalDue.toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -793,7 +793,7 @@ export default function StudentDetailsPage() {
                                       <StatusBadge status={fee.status || "Pending"} />
                                     </td>
                                     <td className="p-3 font-medium">
-                                      Rs. {(fee.amount || 0).toLocaleString()}
+                                      PKR {(fee.amount || 0).toLocaleString()}
                                     </td>
                                     <td className="p-3 text-xs text-muted-foreground">
                                       {fee.paymentDate || "—"}
@@ -1169,7 +1169,7 @@ export default function StudentDetailsPage() {
           </DialogHeader>
           <form onSubmit={handleSaveEdit} className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="edit-amount">Total Fee Amount (Rs.)</Label>
+              <Label htmlFor="edit-amount">Total Fee Amount (PKR)</Label>
               <Input
                 id="edit-amount"
                 type="number"
@@ -1268,12 +1268,12 @@ export default function StudentDetailsPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Original Fee:</span>
                 <span className="font-semibold">
-                  Rs. {(selectedFee?.amount || 0).toLocaleString()}
+                  PKR {(selectedFee?.amount || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between text-destructive font-bold border-t pt-1 mt-1">
                 <span>Remaining Due:</span>
-                <span>Rs. {(selectedFee?.amount || 0).toLocaleString()}</span>
+                <span>PKR {(selectedFee?.amount || 0).toLocaleString()}</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -1363,7 +1363,7 @@ export default function StudentDetailsPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="add-amount">Total Fee Amount (Rs.)</Label>
+              <Label htmlFor="add-amount">Total Fee Amount (PKR)</Label>
               <Input
                 id="add-amount"
                 type="number"

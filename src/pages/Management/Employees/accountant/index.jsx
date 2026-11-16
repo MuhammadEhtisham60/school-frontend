@@ -25,10 +25,10 @@ import { Calculator, TrendingUp, TrendingDown, DollarSign, Plus } from "lucide-r
 import { toast } from "sonner";
 
 const stats = [
-  { label: "Total Income", value: "₹12,45,000", icon: TrendingUp, color: "text-emerald-500" },
-  { label: "Total Expense", value: "₹8,32,000", icon: TrendingDown, color: "text-red-500" },
-  { label: "Net Balance", value: "₹4,13,000", icon: DollarSign, color: "text-blue-500" },
-  { label: "Pending Dues", value: "₹1,85,000", icon: Calculator, color: "text-amber-500" },
+  { label: "Total Income", value: "PKR 12,45,000", icon: TrendingUp, color: "text-emerald-500" },
+  { label: "Total Expense", value: "PKR 8,32,000", icon: TrendingDown, color: "text-red-500" },
+  { label: "Net Balance", value: "PKR 4,13,000", icon: DollarSign, color: "text-blue-500" },
+  { label: "Pending Dues", value: "PKR 1,85,000", icon: Calculator, color: "text-amber-500" },
 ];
 function AccountantPage() {
   const [open, setOpen] = useState(false);
@@ -36,21 +36,21 @@ function AccountantPage() {
     {
       title: "Fee Collection - Class X",
       type: "Income",
-      amount: "₹45,000",
+      amount: "PKR 45,000",
       date: "2026-05-01",
       category: "Fees",
     },
     {
       title: "Electricity Bill",
       type: "Expense",
-      amount: "₹12,500",
+      amount: "PKR 12,500",
       date: "2026-04-28",
       category: "Utility",
     },
     {
       title: "Lab Equipment Purchase",
       type: "Expense",
-      amount: "₹35,000",
+      amount: "PKR 35,000",
       date: "2026-04-25",
       category: "Purchase",
     },
@@ -62,7 +62,7 @@ function AccountantPage() {
       {
         title: fd.get("title"),
         type: fd.get("type"),
-        amount: `₹${fd.get("amount")}`,
+        amount: `PKR ${fd.get("amount")}`,
         date: fd.get("date"),
         category: fd.get("category"),
       },
@@ -107,7 +107,7 @@ function AccountantPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Amount (₹)</Label>
+                    <Label htmlFor="amount">Amount (PKR )</Label>
                     <Input
                       id="amount"
                       name="amount"

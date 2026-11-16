@@ -4,6 +4,8 @@ import {
   AdmissionPage,
   StudentsPage,
   AttendancePage,
+  ClassMonthlyAttendancePage,
+  ClassDailyAttendancePage,
   StudentDetailsPage,
 } from "@/pages/Management/Students";
 import {
@@ -89,6 +91,14 @@ export const privateRoutes = [
       {
         path: "/classes/:id",
         element: <ClassDetailsPage />,
+      },
+      {
+        path: "/classes/:id/attendance",
+        element: <ClassDailyAttendancePage />,
+      },
+      {
+        path: "/attendance/class/:id",
+        element: <ClassMonthlyAttendancePage />,
       },
       {
         path: "/subjects",

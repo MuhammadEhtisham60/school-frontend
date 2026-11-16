@@ -162,7 +162,7 @@ export function downloadFeeReceiptPDF(fee, studentOverride = null) {
   // Fee Breakdown Table
   autoTable(doc, {
     startY: y,
-    head: [["S.No", "Fee Particulars / Billing Month", "Payment Method", "Payment Date", "Status", "Amount (Rs.)"]],
+    head: [["S.No", "Fee Particulars / Billing Month", "Payment Method", "Payment Date", "Status", "Amount (PKR)"]],
     body: [
       [
         "1",
@@ -170,7 +170,7 @@ export function downloadFeeReceiptPDF(fee, studentOverride = null) {
         fee?.paymentMethod || "Cash",
         fee?.paymentDate || "—",
         (fee?.status || "Pending").toUpperCase(),
-        `Rs. ${amount.toLocaleString()}`,
+        `PKR ${amount.toLocaleString()}`,
       ],
     ],
     theme: "grid",
@@ -221,17 +221,17 @@ export function downloadFeeReceiptPDF(fee, studentOverride = null) {
   doc.text("Balance Due:", summaryX + 5, y + 23.5);
 
   doc.setFont("helvetica", "bold");
-  doc.text(`Rs. ${amount.toLocaleString()}`, summaryX + summaryWidth - 5, y + 8, { align: "right" });
+  doc.text(`PKR ${amount.toLocaleString()}`, summaryX + summaryWidth - 5, y + 8, { align: "right" });
   doc.setTextColor(22, 163, 74);
   doc.text(
-    `Rs. ${(isPaid ? amount : 0).toLocaleString()}`,
+    `PKR ${(isPaid ? amount : 0).toLocaleString()}`,
     summaryX + summaryWidth - 5,
     y + 15.5,
     { align: "right" }
   );
   doc.setTextColor(isPaid ? 15 : 220, isPaid ? 23 : 38, isPaid ? 42 : 38);
   doc.text(
-    `Rs. ${(isPaid ? 0 : amount).toLocaleString()}`,
+    `PKR ${(isPaid ? 0 : amount).toLocaleString()}`,
     summaryX + summaryWidth - 5,
     y + 23.5,
     { align: "right" }
@@ -278,9 +278,9 @@ export function downloadStudentFeeStatementPDF(student, feeRecords = []) {
   // Summary KPI Row
   const boxW = (pageWidth - 36) / 3;
   const kpis = [
-    { label: "TOTAL BILLED", val: `Rs. ${totalBilled.toLocaleString()}`, color: [30, 41, 59] },
-    { label: "TOTAL PAID", val: `Rs. ${totalPaid.toLocaleString()}`, color: [22, 163, 74] },
-    { label: "BALANCE DUE", val: `Rs. ${totalDue.toLocaleString()}`, color: totalDue > 0 ? [220, 38, 38] : [71, 85, 105] },
+    { label: "TOTAL BILLED", val: `PKR ${totalBilled.toLocaleString()}`, color: [30, 41, 59] },
+    { label: "TOTAL PAID", val: `PKR ${totalPaid.toLocaleString()}`, color: [22, 163, 74] },
+    { label: "BALANCE DUE", val: `PKR ${totalDue.toLocaleString()}`, color: totalDue > 0 ? [220, 38, 38] : [71, 85, 105] },
   ];
 
   kpis.forEach((k, i) => {
@@ -301,12 +301,12 @@ export function downloadStudentFeeStatementPDF(student, feeRecords = []) {
 
   autoTable(doc, {
     startY: y,
-    head: [["#", "Month", "Status", "Amount (Rs.)", "Payment Date", "Method", "Remarks"]],
+    head: [["#", "Month", "Status", "Amount (PKR)", "Payment Date", "Method", "Remarks"]],
     body: feeRecords.map((f, idx) => [
       idx + 1,
       f.month || "—",
       (f.status || "Pending").toUpperCase(),
-      `Rs. ${Number(f.amount || 0).toLocaleString()}`,
+      `PKR ${Number(f.amount || 0).toLocaleString()}`,
       f.paymentDate || "—",
       f.paymentMethod || "—",
       f.remarks || "—",
@@ -811,7 +811,7 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
     { label: "ACTIVE STUDENTS", val: activeCount, color: [37, 99, 235] },
     { label: "FEES PAID", val: paidCount, color: [22, 163, 74] },
     { label: "FEES PENDING", val: pendingCount, color: [217, 119, 6] },
-    { label: "MONTHLY FEE SUM", val: `Rs. ${totalMonthlyFee.toLocaleString()}`, color: [79, 70, 229] },
+    { label: "MONTHLY FEE SUM", val: `PKR ${totalMonthlyFee.toLocaleString()}`, color: [79, 70, 229] },
   ];
 
   stats.forEach((st, i) => {
@@ -841,7 +841,7 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
         "Class & Section",
         "Gender",
         "Contact / Mobile",
-        "Monthly Fee (Rs.)",
+        "Monthly Fee (PKR)",
         "Fee Status",
         "Student Status",
       ],
@@ -857,7 +857,7 @@ export function downloadStudentListWithFeesPDF(studentsList = [], filters = {}) 
         `Class ${s.class || "—"}-${s.section || "—"}`,
         s.gender || "—",
         s.mobile || s.contact || "—",
-        `Rs. ${monthlyFee.toLocaleString()}`,
+        `PKR ${monthlyFee.toLocaleString()}`,
         feeStatus.toUpperCase(),
         s.is_active !== false ? "ACTIVE" : "INACTIVE",
       ];
@@ -952,7 +952,7 @@ export function downloadTeacherListPDF(teachersList = [], filters = {}) {
     { label: "ACTIVE FACULTY", val: activeCount, color: [37, 99, 235] },
     { label: "FULL-TIME STAFF", val: fullTimeCount, color: [22, 163, 74] },
     { label: "SALARY PAID", val: `${paidCount} / ${totalTeachers}`, color: [217, 119, 6] },
-    { label: "MONTHLY PAYROLL", val: `Rs. ${totalMonthlyPayroll.toLocaleString()}`, color: [79, 70, 229] },
+    { label: "MONTHLY PAYROLL", val: `PKR ${totalMonthlyPayroll.toLocaleString()}`, color: [79, 70, 229] },
   ];
 
   stats.forEach((st, i) => {
@@ -983,7 +983,7 @@ export function downloadTeacherListPDF(teachersList = [], filters = {}) {
         "Assigned Classes",
         "Contact",
         "Type",
-        "Net Salary (Rs.)",
+        "Net Salary (PKR)",
         "Payroll",
         "Status",
       ],
@@ -997,7 +997,7 @@ export function downloadTeacherListPDF(teachersList = [], filters = {}) {
       (t.classes || []).length > 0 ? t.classes.map((c) => `Class ${c}`).join(", ") : "—",
       t.phone || "—",
       t.employmentType || t.type || "Full-time",
-      `Rs. ${Number(t.salary || 0).toLocaleString()}`,
+      `PKR ${Number(t.salary || 0).toLocaleString()}`,
       (t.salaryStatus || "Paid").toUpperCase(),
       (t.status || "Active").toUpperCase(),
     ]),
@@ -1101,14 +1101,14 @@ export function downloadTeacherSalarySlipPDF(salary, teacherOverride = null) {
 
   autoTable(doc, {
     startY: y,
-    head: [["S.No", "Compensation & Deduction Head", "Category", "Amount (Rs.)"]],
+    head: [["S.No", "Compensation & Deduction Head", "Category", "Amount (PKR)"]],
     body: [
-      ["1", "Basic Monthly Salary", "Earnings (+)", `Rs. ${basic.toLocaleString()}`],
-      ["2", "House Rent / Medical / Conveyance Allowances", "Earnings (+)", `Rs. ${allowances.toLocaleString()}`],
-      ["3", "Performance Bonus / Extra Duty Allowance", "Earnings (+)", `Rs. ${bonus.toLocaleString()}`],
-      ["4", "Gross Earnings", "Subtotal", `Rs. ${gross.toLocaleString()}`],
-      ["5", "Tax / Provident Fund / Leave Deductions", "Deductions (-)", `Rs. ${deductions.toLocaleString()}`],
-      ["6", "Net Payable / Disbursed Salary", "NET PAYABLE", `Rs. ${net.toLocaleString()}`],
+      ["1", "Basic Monthly Salary", "Earnings (+)", `PKR ${basic.toLocaleString()}`],
+      ["2", "House Rent / Medical / Conveyance Allowances", "Earnings (+)", `PKR ${allowances.toLocaleString()}`],
+      ["3", "Performance Bonus / Extra Duty Allowance", "Earnings (+)", `PKR ${bonus.toLocaleString()}`],
+      ["4", "Gross Earnings", "Subtotal", `PKR ${gross.toLocaleString()}`],
+      ["5", "Tax / Provident Fund / Leave Deductions", "Deductions (-)", `PKR ${deductions.toLocaleString()}`],
+      ["6", "Net Payable / Disbursed Salary", "NET PAYABLE", `PKR ${net.toLocaleString()}`],
     ],
     theme: "grid",
     headStyles: {
@@ -1184,11 +1184,11 @@ export function downloadTeacherSalaryStatementPDF(teacher, salaryRecords = []) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(15, 23, 42);
-  doc.text(`Monthly Package: Rs. ${Number(teacher?.salary || 0).toLocaleString()}`, 20, y + 12);
+  doc.text(`Monthly Package: PKR ${Number(teacher?.salary || 0).toLocaleString()}`, 20, y + 12);
   doc.setTextColor(22, 163, 74);
-  doc.text(`Total Disbursed: Rs. ${totalPaid.toLocaleString()}`, pageWidth / 2 - 20, y + 12);
+  doc.text(`Total Disbursed: PKR ${totalPaid.toLocaleString()}`, pageWidth / 2 - 20, y + 12);
   doc.setTextColor(217, 119, 6);
-  doc.text(`Pending Dues: Rs. ${totalPending.toLocaleString()}`, pageWidth - 75, y + 12);
+  doc.text(`Pending Dues: PKR ${totalPending.toLocaleString()}`, pageWidth - 75, y + 12);
 
   y += 26;
 
@@ -1198,11 +1198,11 @@ export function downloadTeacherSalaryStatementPDF(teacher, salaryRecords = []) {
     body: salaryRecords.map((s, idx) => [
       idx + 1,
       `${s.month} ${s.year || "2026"}`,
-      `Rs. ${Number(s.basicSalary || 0).toLocaleString()}`,
-      `Rs. ${Number(s.allowances || 0).toLocaleString()}`,
-      `Rs. ${Number(s.bonus || 0).toLocaleString()}`,
-      `Rs. ${Number(s.deductions || 0).toLocaleString()}`,
-      `Rs. ${Number(s.netAmount || s.amount || 0).toLocaleString()}`,
+      `PKR ${Number(s.basicSalary || 0).toLocaleString()}`,
+      `PKR ${Number(s.allowances || 0).toLocaleString()}`,
+      `PKR ${Number(s.bonus || 0).toLocaleString()}`,
+      `PKR ${Number(s.deductions || 0).toLocaleString()}`,
+      `PKR ${Number(s.netAmount || s.amount || 0).toLocaleString()}`,
       s.paymentDate || "—",
       (s.status || "Paid").toUpperCase(),
     ]),
@@ -1256,7 +1256,7 @@ export function downloadTeacherProfilePDF(teacher) {
       ["CNIC No", teacher?.cnic || "—", "Date of Birth", teacher?.dob || "—"],
       ["Phone", teacher?.phone || "—", "Email", teacher?.email || "—"],
       ["Assigned Classes", (teacher?.classes || []).map((c) => `Class ${c}`).join(", ") || "—", "Class Teacher Of", teacher?.classTeacherOf || "—"],
-      ["Employment Type", teacher?.employmentType || teacher?.type || "Full-time", "Net Monthly Salary", `Rs. ${Number(teacher?.salary || 0).toLocaleString()}`],
+      ["Employment Type", teacher?.employmentType || teacher?.type || "Full-time", "Net Monthly Salary", `PKR ${Number(teacher?.salary || 0).toLocaleString()}`],
       ["Bank Name", teacher?.bankName || "—", "Account / IBAN", teacher?.bankAccountNo || teacher?.iban || "—"],
       ["Address", teacher?.address || "—", "City", teacher?.city || "Lahore"],
     ],
@@ -1618,6 +1618,41 @@ export function downloadResultsLedgerPDF(results = [], subtitle = "Academic Resu
 
   drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Controller of Exams", "Academic Coordinator", "Principal"]);
   doc.save(`Results_Ledger_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+/**
+ * 16. Download Class Daily Attendance Sheet PDF
+ */
+export function downloadClassAttendancePDF(className, section, attDate, rows = []) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const presentCount = rows.filter((r) => r.status === "Present").length;
+  const absentCount = rows.filter((r) => r.status === "Absent").length;
+  const leaveCount = rows.filter((r) => r.status === "Leave").length;
+
+  const y = drawSchoolHeader(
+    doc,
+    "Daily Student Attendance Register",
+    `Class ${className || "All"}${section && section !== "all" ? `-${section}` : ""}   |   Date: ${attDate}   |   Present: ${presentCount}   Absent: ${absentCount}   Leave: ${leaveCount}`
+  );
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Roll No", "Student Name", "Section", "Status", "Leave Reason / Remarks"]],
+    body: rows.map((r) => [
+      r.rollNo || "—",
+      r.fullName || r.name || "—",
+      r.section || "A",
+      r.status || "Present",
+      r.status === "Leave" ? r.leaveReason || "—" : "—",
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontSize: 8.5 },
+    bodyStyles: { fontSize: 8.5, cellPadding: 2.8 },
+    margin: { left: 14, right: 14 },
+  });
+
+  drawSignatureFooter(doc, doc.lastAutoTable.finalY + 8, ["Class Teacher", "Coordinator", "Principal"]);
+  doc.save(`Attendance_Class_${sanitizeFilename(className)}_${attDate}.pdf`);
 }
 
 

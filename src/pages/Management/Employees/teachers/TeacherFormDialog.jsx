@@ -661,7 +661,7 @@ export function TeacherFormDialog({ open, setOpen, teacher = null, onSuccess }) 
             <TabsContent value="payroll" className="space-y-4 pt-3">
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <Label>Basic Monthly Salary (Rs.)</Label>
+                  <Label>Basic Monthly Salary (PKR)</Label>
                   <Input
                     type="number"
                     min="0"
@@ -699,7 +699,7 @@ export function TeacherFormDialog({ open, setOpen, teacher = null, onSuccess }) 
                   </p>
                 </div>
                 <p className="text-2xl font-black text-primary">
-                  Rs. {Number(form.salary || 0).toLocaleString()}
+                  PKR {Number(form.salary || 0).toLocaleString()}
                 </p>
               </div>
 

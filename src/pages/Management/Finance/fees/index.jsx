@@ -341,20 +341,20 @@ function FeesPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Collected (MTD)"
-          value={`Rs. ${stats.collectedMtd.toLocaleString()}`}
+          value={`PKR ${stats.collectedMtd.toLocaleString()}`}
           icon={Wallet}
           variant="success"
           trend={stats.growth}
         />
         <StatCard
           label="Pending"
-          value={`Rs. ${stats.pendingTotal.toLocaleString()}`}
+          value={`PKR ${stats.pendingTotal.toLocaleString()}`}
           icon={AlertCircle}
           variant="warning"
         />
         <StatCard
           label="Avg Ticket"
-          value={`Rs. ${stats.avgTicket.toLocaleString()}`}
+          value={`PKR ${stats.avgTicket.toLocaleString()}`}
           icon={CreditCard}
           variant="info"
         />
@@ -483,7 +483,7 @@ function FeesPage() {
                   </TableCell>
                   <TableCell className="font-semibold">{fee.month}</TableCell>
                   <TableCell className="font-medium">
-                    Rs. {(fee.amount || 0).toLocaleString()}
+                    PKR {(fee.amount || 0).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
                     {fee.paymentDate || "—"}
@@ -638,7 +638,7 @@ function FeesPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="add-amount">Total Fee Amount (Rs.)</Label>
+              <Label htmlFor="add-amount">Total Fee Amount (PKR)</Label>
               <Input
                 id="add-amount"
                 type="number"
@@ -730,7 +730,7 @@ function FeesPage() {
           </DialogHeader>
           <form onSubmit={handleSaveEdit} className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="edit-amount">Total Fee Amount (Rs.)</Label>
+              <Label htmlFor="edit-amount">Total Fee Amount (PKR)</Label>
               <Input
                 id="edit-amount"
                 type="number"
@@ -833,7 +833,7 @@ function FeesPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Fee Amount:</span>
                 <span className="font-semibold">
-                  Rs. {(selectedFee?.amount || 0).toLocaleString()}
+                  PKR {(selectedFee?.amount || 0).toLocaleString()}
                 </span>
               </div>
             </div>

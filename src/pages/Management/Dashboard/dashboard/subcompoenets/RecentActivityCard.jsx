@@ -60,7 +60,7 @@ export function RecentActivityCard() {
       const studentName = f.studentName || f.studentId?.fullName || f.studentId?.name || "Student";
       items.push({
         id: `fee-${f.id}`,
-        text: `Fee ${String(f.status || "Paid").toLowerCase()}: Rs. ${Number(f.amount || 0).toLocaleString()} (${studentName})`,
+        text: `Fee ${String(f.status || "Paid").toLowerCase()}: PKR ${Number(f.amount || 0).toLocaleString()} (${studentName})`,
         time: formatRelativeTime(ts),
         sortTime: ts ? new Date(ts).getTime() : 0,
         icon: Wallet,

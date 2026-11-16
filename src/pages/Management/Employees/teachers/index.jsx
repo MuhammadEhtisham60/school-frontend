@@ -460,7 +460,7 @@ function TeachersPage() {
         />
         <StatCard
           label="Monthly Payroll"
-          value={`Rs. ${totalMonthlyPayroll.toLocaleString()}`}
+          value={`PKR ${totalMonthlyPayroll.toLocaleString()}`}
           icon={Wallet}
           variant="info"
           sub="Total net compensation"
@@ -666,7 +666,7 @@ function TeachersPage() {
                           Net Salary
                         </p>
                         <p className="font-bold text-xs mt-0.5">
-                          Rs. {Number(t.salary || 0).toLocaleString()}
+                          PKR {Number(t.salary || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="p-2 rounded-lg bg-muted/40">
@@ -827,7 +827,7 @@ function TeachersPage() {
                         <p className="text-muted-foreground">{t.email}</p>
                       </TableCell>
                       <TableCell className="font-semibold">
-                        Rs. {Number(t.salary || 0).toLocaleString()}
+                        PKR {Number(t.salary || 0).toLocaleString()}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={t.salaryStatus || "Paid"} />
@@ -955,18 +955,18 @@ function TeachersPage() {
                         <TableCell className="font-semibold">
                           {sal.month} {sal.year}
                         </TableCell>
-                        <TableCell>Rs. {Number(sal.basicSalary || 0).toLocaleString()}</TableCell>
+                        <TableCell>PKR {Number(sal.basicSalary || 0).toLocaleString()}</TableCell>
                         <TableCell className="text-xs">
-                          +Rs. {Number(sal.allowances || 0).toLocaleString()}
+                          +PKR {Number(sal.allowances || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-xs text-success">
-                          +Rs. {Number(sal.bonus || 0).toLocaleString()}
+                          +PKR {Number(sal.bonus || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-xs text-destructive">
-                          -Rs. {Number(sal.deductions || 0).toLocaleString()}
+                          -PKR {Number(sal.deductions || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="font-bold text-primary">
-                          Rs. {Number(sal.netAmount || 0).toLocaleString()}
+                          PKR {Number(sal.netAmount || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {sal.paymentDate || "—"}
@@ -1216,7 +1216,7 @@ function TeachersPage() {
                 </option>
                 {rawTeachers.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.fullName || t.name} ({t.employeeId} - Rs.{" "}
+                    {t.fullName || t.name} ({t.employeeId} - PKR{" "}
                     {Number(t.salary || 0).toLocaleString()})
                   </option>
                 ))}
@@ -1238,7 +1238,7 @@ function TeachersPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label>Net Payable (Rs.)</Label>
+                <Label>Net Payable (PKR)</Label>
                 <Input
                   type="number"
                   value={salaryForm.netAmount}

@@ -9,12 +9,12 @@ import { GraduationCap, BookOpen, Layers, Wallet } from "lucide-react";
 const formatCurrencyCompact = (amount) => {
   const num = Number(amount || 0);
   if (num >= 1_000_000) {
-    return `Rs. ${(num / 1_000_000).toFixed(2).replace(/\.00$/, "")}M`;
+    return `PKR ${(num / 1_000_000).toFixed(2).replace(/\.00$/, "")}M`;
   }
   if (num >= 1_000) {
-    return `Rs. ${(num / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+    return `PKR ${(num / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
   }
-  return `Rs. ${num.toLocaleString()}`;
+  return `PKR ${num.toLocaleString()}`;
 };
 
 export function DashboardKpiCards() {
