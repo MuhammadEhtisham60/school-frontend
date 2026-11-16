@@ -30,6 +30,7 @@ import {
   FileManagerPage,
   LibraryPage,
   PaperCollectionPage,
+  PapersPage,
   EventCalendarPage,
   EventDetailsPage,
   NoticePage,
@@ -127,6 +128,10 @@ export const privateRoutes = [
       {
         path: "/library",
         element: <LibraryPage />,
+      },
+      {
+        path: "/papers",
+        element: <PapersPage />,
       },
       {
         path: "/attendance",

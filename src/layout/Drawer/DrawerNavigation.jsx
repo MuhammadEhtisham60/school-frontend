@@ -69,6 +69,7 @@ const operationItems = [
 const resourceItems = [
   { title: "File Manager", url: "/file-manager", icon: FolderOpen },
   { title: "Paper Collection", url: "/paper-collection", icon: FileStack },
+  { title: "Papers", url: "/papers", icon: FileText },
 ];
 
 const websiteItems = [

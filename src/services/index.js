@@ -60,6 +60,8 @@ export const baseApi = createApi({
     "ClassRoutine",
     "Exam",
     "StudentAttendance",
+    "LibraryFolder",
+    "LibraryItem",
   ],
   endpoints: () => ({}),
 });

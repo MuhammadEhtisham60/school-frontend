@@ -1,6 +1,7 @@
 export { default as FileManagerPage } from "./file-manager";
 export { default as LibraryPage } from "./library";
 export { default as PaperCollectionPage } from "./paper-collection";
+export { default as PapersPage } from "./papers";
 export { default as EventCalendarPage } from "./event-calendar";
 export { default as EventDetailsPage } from "./event-calendar/details";
 export { default as NoticePage } from "./notice";
