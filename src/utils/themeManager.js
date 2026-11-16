@@ -1,4 +1,5 @@
 export const THEME_STORAGE_KEY = "edupulse:theme";
+export const COLOR_MODE_STORAGE_KEY = "edupulse:color-mode";
 
 export const THEMES = [
   {
@@ -104,8 +105,30 @@ export function applyTheme(themeId) {
   }
   if (typeof window !== "undefined") {
     localStorage.setItem(THEME_STORAGE_KEY, validId);
+    window.dispatchEvent(new CustomEvent("edupulse-theme-change"));
   }
   return validId;
+}
+
+export function getSavedColorMode() {
+  if (typeof window === "undefined") return "light";
+  return localStorage.getItem(COLOR_MODE_STORAGE_KEY) === "dark" ? "dark" : "light";
+}
+
+export function applyColorMode(mode) {
+  const next = mode === "dark" ? "dark" : "light";
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.toggle("dark", next === "dark");
+  }
+  if (typeof window !== "undefined") {
+    localStorage.setItem(COLOR_MODE_STORAGE_KEY, next);
+    window.dispatchEvent(new CustomEvent("edupulse-theme-change"));
+  }
+  return next;
+}
+
+export function toggleColorMode() {
+  return applyColorMode(getSavedColorMode() === "dark" ? "light" : "dark");
 }
 
 const THEME_PDF_PALETTES = {

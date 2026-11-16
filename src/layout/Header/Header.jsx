@@ -1,19 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Sparkles, Globe } from "lucide-react";
+import { Sparkles, Globe, Moon, Sun } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HeaderSearch } from "./HeaderSearch";
 import { HeaderNotifications } from "./HeaderNotifications";
 import { HeaderProfile } from "./HeaderProfile";
+import { getSavedColorMode, toggleColorMode } from "@/utils/themeManager";
 
 export function Header() {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [colorMode, setColorMode] = useState(() => getSavedColorMode());
+
+  useEffect(() => {
+    const sync = () => setColorMode(getSavedColorMode());
+    window.addEventListener("edupulse-theme-change", sync);
+    return () => window.removeEventListener("edupulse-theme-change", sync);
+  }, []);
+
+  const handleToggleColorMode = () => {
+    setColorMode(toggleColorMode());
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -42,6 +54,21 @@ export function Header() {
           <Link to="/site">
             <Globe className="h-4 w-4" /> Visit Website
           </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleToggleColorMode}
+          title={colorMode === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label={colorMode === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="h-9 w-9 rounded-lg border-border/70 bg-background/60 hover:bg-accent cursor-pointer"
+        >
+          {colorMode === "dark" ? (
+            <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </Button>
         <HeaderNotifications />
         <HeaderProfile user={user} onLogout={handleLogout} />
