@@ -11,6 +11,7 @@ import {
   Instagram,
   Twitter,
   Youtube,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -24,11 +25,13 @@ const nav = [
   { to: "/site/campus", label: "Campus Life" },
   { to: "/site/contact", label: "Contact" },
 ];
+
 function SiteLayout() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const pathname = location.pathname;
   const [content] = useSiteContent();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-40 glass border-b">
@@ -42,6 +45,7 @@ function SiteLayout() {
               <div className="text-[10px] text-muted-foreground -mt-0.5">{content.brand.sub}</div>
             </div>
           </Link>
+
           <nav className="hidden lg:flex items-center gap-1">
             {nav.map((n) => {
               const active = n.to === "/site" ? pathname === "/site" : pathname.startsWith(n.to);
@@ -49,16 +53,23 @@ function SiteLayout() {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`px-3.5 py-2 text-sm rounded-lg transition-smooth ${active ? "text-primary font-semibold bg-accent/60" : "text-foreground/70 hover:text-primary hover:bg-accent/40"}`}
+                  className={`px-3.5 py-2 text-sm rounded-lg transition-smooth ${
+                    active
+                      ? "text-primary font-semibold bg-accent/60"
+                      : "text-foreground/70 hover:text-primary hover:bg-accent/40"
+                  }`}
                 >
                   {n.label}
                 </Link>
               );
             })}
           </nav>
+
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-              <Link to="/">Backoffice</Link>
+            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex gap-1.5">
+              <Link to="/">
+                <LayoutDashboard className="h-3.5 w-3.5 text-primary" /> Open ERP
+              </Link>
             </Button>
             <Button
               asChild
@@ -79,6 +90,7 @@ function SiteLayout() {
             </Button>
           </div>
         </div>
+
         {open && (
           <div className="lg:hidden border-t bg-card">
             <div className="px-4 py-3 flex flex-col gap-1">
@@ -92,6 +104,13 @@ function SiteLayout() {
                   {n.label}
                 </Link>
               ))}
+              <Link
+                to="/"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 text-sm font-medium text-primary rounded-lg hover:bg-accent"
+              >
+                Open ERP Backoffice
+              </Link>
             </div>
           </div>
         )}
@@ -110,7 +129,9 @@ function SiteLayout() {
               </div>
               <span className="font-bold text-gradient">{content.brand.name}</span>
             </div>
-            <p className="text-sm text-muted-foreground">{content.footer.tagline}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {content.footer.tagline}
+            </p>
             <div className="flex gap-2 mt-4">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
                 <a
@@ -123,8 +144,9 @@ function SiteLayout() {
               ))}
             </div>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Explore</h4>
+            <h4 className="font-semibold mb-3 text-sm">School Portal</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               {nav.map((n) => (
                 <li key={n.to}>
@@ -135,32 +157,50 @@ function SiteLayout() {
               ))}
             </ul>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Programs</h4>
+            <h4 className="font-semibold mb-3 text-sm">ERP Capabilities</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Pre-Primary (Pre-K – KG)</li>
-              <li>Primary (Grades 1–5)</li>
-              <li>Middle School (6–8)</li>
-              <li>High School (9–12)</li>
+              <li>
+                <Link to="/attendance" className="hover:text-primary">
+                  Smart Attendance (P / A / L)
+                </Link>
+              </li>
+              <li>
+                <Link to="/fees" className="hover:text-primary">
+                  PKR Fees &amp; Payroll
+                </Link>
+              </li>
+              <li>
+                <Link to="/exam" className="hover:text-primary">
+                  Exams &amp; Result Ledgers
+                </Link>
+              </li>
+              <li>
+                <Link to="/class-routine" className="hover:text-primary">
+                  Class Routines &amp; Subjects
+                </Link>
+              </li>
             </ul>
           </div>
+
           <div>
             <h4 className="font-semibold mb-3 text-sm">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 text-primary" /> {content.contact.address}
+                <MapPin className="h-4 w-4 mt-0.5 text-primary shrink-0" /> {content.contact.address}
               </li>
               <li className="flex gap-2">
-                <Phone className="h-4 w-4 mt-0.5 text-primary" /> {content.contact.phone}
+                <Phone className="h-4 w-4 mt-0.5 text-primary shrink-0" /> {content.contact.phone}
               </li>
               <li className="flex gap-2">
-                <Mail className="h-4 w-4 mt-0.5 text-primary" /> {content.contact.email}
+                <Mail className="h-4 w-4 mt-0.5 text-primary shrink-0" /> {content.contact.email}
               </li>
             </ul>
           </div>
         </div>
         <div className="border-t py-4 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} EduPulse Academy. All rights reserved.
+          © {new Date().getFullYear()} {content.brand.name} — Smart School &amp; Campus ERP. All rights reserved.
         </div>
       </footer>
     </div>

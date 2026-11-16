@@ -9,6 +9,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { FormikText, FormikCheckBox } from "@/components/common/sharedfields";
 import { apiHandleToaster } from "@/components/common/tosater/apiHandleToaster";
+import loginBg from "@/assets/login.jpg";
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email address").required("Email is required"),
@@ -63,21 +64,28 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left - Branding Panel */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-primary relative flex-col items-center justify-center p-12 text-primary-foreground overflow-hidden">
-        <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
-        <div className="absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-white/5" />
-        <div className="absolute top-1/3 right-10 h-40 w-40 rounded-full bg-white/10" />
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 text-white overflow-hidden">
+        <img
+          src={loginBg}
+          alt="The Force School System"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/75 via-slate-950/15 to-slate-950/80" />
 
-        <div className="relative z-10 flex flex-col items-center text-center gap-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg">
-            <GraduationCap className="h-10 w-10" />
+        {/* Top Title */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+            <GraduationCap className="h-6 w-6" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight">The Force School System</h1>
-          <p className="max-w-sm text-lg text-white/80 leading-relaxed">
-            Enterprise school management portal — secure JWT access for administration, academics, payroll, and student records.
-          </p>
-          <div className="mt-6 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white/90">
-            <ShieldCheck className="h-4 w-4" />
+          <h1 className="text-3xl font-bold tracking-tight drop-shadow-sm">
+            The Force School System
+          </h1>
+        </div>
+
+        {/* Bottom Badge */}
+        <div className="relative z-10 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 px-5 py-2.5 text-xs font-medium text-white shadow-lg">
+            <ShieldCheck className="h-4 w-4 shrink-0" />
             <span>24-Hour Encrypted JWT Session Protection</span>
           </div>
         </div>

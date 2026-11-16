@@ -18,7 +18,6 @@ import {
   BarChart3,
   Settings,
   School,
-  Globe,
   Calculator,
   FileText,
   Bell,
@@ -73,7 +72,6 @@ const resourceItems = [
 ];
 
 const websiteItems = [
-  { title: "Site Manage", url: "/site-manage", icon: Globe },
   { title: "Visit Website", url: "/site", icon: School },
 ];
 

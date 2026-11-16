@@ -5,4 +5,3 @@ export { default as SiteAcademics } from "./academics";
 export { default as SiteAdmissions } from "./admissions";
 export { default as SiteCampus } from "./campus";
 export { default as SiteContact } from "./contact";
-export { default as SiteManage } from "./manage";

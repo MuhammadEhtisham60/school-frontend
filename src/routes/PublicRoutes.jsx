@@ -8,7 +8,6 @@ import {
   SiteAdmissions,
   SiteCampus,
   SiteContact,
-  SiteManage,
 } from "@/pages/Site";
 import UnauthorizedPage from "@/pages/auth/unauthorized";
 
@@ -20,10 +19,6 @@ export const publicRoutes = [
   {
     path: "/unauthorized",
     element: <UnauthorizedPage />,
-  },
-  {
-    path: "/site-manage",
-    element: <SiteManage />,
   },
   {
     path: "/site",

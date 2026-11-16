@@ -1,75 +1,49 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
 export const defaultSiteContent = {
   hero: {
-    badge: "Admissions 2025–26 Now Open",
-    title: "Where curious minds become",
-    titleAccent: "confident leaders.",
+    badge: "Smart Campus • Powered by EduPulse ERP",
+    title: "Modern Education Meets",
+    titleAccent: "Intelligent School ERP.",
     subtitle:
-      "An award-winning K–12 academy blending rigorous academics, creativity and character — preparing students for a world that hasn't been invented yet.",
-    primaryCta: "Start Application",
-    secondaryCta: "Discover EduPulse",
+      "A future-ready K–12 institution powered by an all-in-one digital School ERP — unifying admissions, smart attendance, PKR fee billing, timetables, exams, results, and campus communication.",
+    primaryCta: "Apply Online",
+    secondaryCta: "Explore ERP Modules",
   },
   stats: [
-    { v: "26", l: "Years of Excellence" },
-    { v: "2,400+", l: "Happy Students" },
-    { v: "180+", l: "Expert Teachers" },
-    { v: "98%", l: "University Placement" },
+    { v: "18+", l: "Integrated ERP Modules" },
+    { v: "100%", l: "PKR Automated Billing" },
+    { v: "PDF & XLS", l: "Instant Report Exports" },
+    { v: "24/7", l: "Real-Time Campus Sync" },
   ],
   promise: {
-    eyebrow: "Our Promise",
-    title: "Education that",
-    titleAccent: "thinks ahead.",
+    eyebrow: "Modern Era Campus",
+    title: "One unified platform for",
+    titleAccent: "every school workflow.",
     description:
-      "We blend timeless values with future-ready skills — small class sizes, project-based learning and a faculty that genuinely loves teaching.",
+      "From the moment a student applies for admission to daily attendance, class routines, exams, result ledgers, and PKR fee collection — every department works in real time.",
     bullets: [
-      "Average class size of 18 students",
-      "1:1 device program from Grade 4",
-      "Mandarin, French & Spanish from Grade 1",
-      "Counselling, wellbeing & life-skills program",
-      "International exchanges & MUN",
+      "Class-wise daily attendance (Present, Absent, Leave with optional reason)",
+      "Automated PKR fee vouchers, receipts, and accountant payroll ledgers",
+      "Real-time exam date-sheets, result grading, and instant PDF/Excel exports",
+      "Dynamic class routines, subject allocation, and question paper bank",
+      "Role-based access for Admins, Teachers, Accountants, and Staff",
     ],
   },
   contact: {
     address: "Main Boulevard, Faisalabad, Pakistan",
     phone: "+92 300 0000000",
-    email: "hello@edupulse.edu",
-    hours: "Mon – Fri, 8:00 – 16:00",
+    email: "hello@edupulse.edu.pk",
+    hours: "Mon – Sat, 8:00 AM – 4:00 PM",
   },
   footer: {
-    tagline: "Nurturing curious minds and confident leaders since 1998.",
+    tagline:
+      "Empowering modern schools with academic excellence and a complete, real-time School Management ERP.",
   },
-  brand: { name: "EduPulse", sub: "Academy of Excellence" },
+  brand: { name: "EduPulse", sub: "Smart School & ERP" },
 };
-const KEY = "edupulse:site-content:v1";
-export function loadSiteContent() {
-  if (typeof window === "undefined") return defaultSiteContent;
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return defaultSiteContent;
-    return { ...defaultSiteContent, ...JSON.parse(raw) };
-  } catch {
-    return defaultSiteContent;
-  }
-}
-export function saveSiteContent(c) {
-  localStorage.setItem(KEY, JSON.stringify(c));
-  window.dispatchEvent(new CustomEvent("site-content-change"));
-}
+
 export function useSiteContent() {
   const [content, setContent] = useState(defaultSiteContent);
-  useEffect(() => {
-    setContent(loadSiteContent());
-    const onChange = () => setContent(loadSiteContent());
-    window.addEventListener("site-content-change", onChange);
-    window.addEventListener("storage", onChange);
-    return () => {
-      window.removeEventListener("site-content-change", onChange);
-      window.removeEventListener("storage", onChange);
-    };
-  }, []);
-  const update = (c) => {
-    setContent(c);
-    saveSiteContent(c);
-  };
-  return [content, update];
+  return [content, setContent];
 }
