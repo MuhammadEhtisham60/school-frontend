@@ -101,8 +101,18 @@ function LoginPage() {
             </div>
             <h2 className="text-2xl font-bold tracking-tight text-foreground">Sign in to your account</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Enter your administrator credentials to access the management dashboard.
+              Sign in as a Teacher, Student, Parent, or Administrator to access your portal.
             </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {["Teacher", "Student", "Parent", "Admin"].map((role) => (
+                <span
+                  key={role}
+                  className="inline-flex items-center rounded-md border border-border bg-muted/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
+                >
+                  Login as {role}
+                </span>
+              ))}
+            </div>
           </div>
 
           <Formik

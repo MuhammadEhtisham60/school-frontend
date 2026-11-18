@@ -1,6 +1,11 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetStudentQuery } from "@/services/private/studentService";
+import { useSelector } from "react-redux";
+import {
+  useGetStudentQuery,
+  useResetStudentPasswordMutation,
+} from "@/services/private/studentService";
+import { isAdminOrSuperAdmin } from "@/utils/roleAccess";
 import { useGetClassesQuery } from "@/services/private/classService";
 import {
   useGetStudentFeesListQuery,
@@ -33,6 +38,7 @@ import {
   Loader2,
   AlertCircle,
   Pencil,
+  KeyRound,
   ArrowLeft,
   DollarSign,
   GraduationCap,
@@ -80,8 +86,38 @@ const getInitials = (name) => {
 export default function StudentDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.auth.user);
+  const canManagePassword = isAdminOrSuperAdmin(currentUser);
   const { data, isLoading, error } = useGetStudentQuery(id, { skip: !id });
   const student = data?.student;
+
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetStudentPassword, { isLoading: isResettingPassword }] =
+    useResetStudentPasswordMutation();
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      return toast.error("Password must be at least 6 characters");
+    }
+    if (newPassword !== confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+    try {
+      const res = await resetStudentPassword({
+        id: student.id,
+        newPassword,
+      }).unwrap();
+      toast.success(res?.message || "Student login password updated");
+      setIsPasswordOpen(false);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update student password");
+    }
+  };
 
   const { data: classesResponse } = useGetClassesQuery();
   const classesList = classesResponse?.data || [];
@@ -504,12 +540,27 @@ export default function StudentDetailsPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back to Directory
         </Button>
-        <Button
-          onClick={() => navigate(`/admission/${student.id}`)}
-          className="gap-2 gradient-primary text-primary-foreground border-0 shadow-glow self-start"
-        >
-          <Pencil className="h-4 w-4" /> Edit Profile
-        </Button>
+        <div className="flex flex-wrap items-center gap-2 self-start">
+          {canManagePassword && student?.email && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setNewPassword("");
+                setConfirmPassword("");
+                setIsPasswordOpen(true);
+              }}
+              className="gap-2"
+            >
+              <KeyRound className="h-4 w-4 text-primary" /> Change Password
+            </Button>
+          )}
+          <Button
+            onClick={() => navigate(`/admission/${student.id}`)}
+            className="gap-2 gradient-primary text-primary-foreground border-0 shadow-glow"
+          >
+            <Pencil className="h-4 w-4" /> Edit Profile
+          </Button>
+        </div>
       </div>
 
       {/* Header Profile Summary */}
@@ -1617,6 +1668,70 @@ export default function StudentDetailsPage() {
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 )}
                 Save Results
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin / Super Admin: Change Student Login Password */}
+      <Dialog open={isPasswordOpen} onOpenChange={setIsPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-4 w-4 text-primary" /> Change Student Login Password
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
+            <div className="rounded-lg border bg-muted/40 p-3 text-xs space-y-1">
+              <div>
+                <span className="text-muted-foreground">Student:</span>{" "}
+                <span className="font-semibold">{student?.fullName}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Login Email:</span>{" "}
+                <span className="font-mono font-medium">{student?.email}</span>
+              </div>
+              <div className="text-muted-foreground">
+                Default initial password on admission: <code className="font-mono font-semibold text-foreground">std12345</code>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>New Password</Label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Minimum 6 characters"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Confirm New Password</Label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter new password"
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsPasswordOpen(false)}
+                disabled={isResettingPassword}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isResettingPassword}
+                className="gradient-primary text-primary-foreground border-0"
+              >
+                {isResettingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Update Password
               </Button>
             </DialogFooter>
           </form>

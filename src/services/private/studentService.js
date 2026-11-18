@@ -108,6 +108,13 @@ export const studentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "StudentAttendance", id: "LIST" }],
     }),
+    resetStudentPassword: builder.mutation({
+      query: ({ id, newPassword }) => ({
+        url: `students/${id}/reset-password/`,
+        method: "POST",
+        body: { newPassword },
+      }),
+    }),
   }),
 });
 
@@ -123,4 +130,5 @@ export const {
   useGetNextRollNoQuery,
   useGetStudentAttendanceQuery,
   useSaveStudentAttendanceMutation,
+  useResetStudentPasswordMutation,
 } = studentApi;

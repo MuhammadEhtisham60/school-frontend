@@ -33,6 +33,7 @@ import {
 import { DrawerHeader } from "./DrawerHeader";
 import { DrawerContent } from "./DrawerContent";
 import { DrawerFooter } from "./DrawerFooter";
+import { filterSectionsByRole } from "@/utils/roleAccess";
 
 const mainItems = [
   { title: "Dashboard", url: "/backoffice", icon: LayoutDashboard },
@@ -103,7 +104,7 @@ export function DrawerNavigation() {
       badge: typeof c.studentCount === "number" ? c.studentCount : undefined,
     }));
 
-    return sections.map((sec) => {
+    const mapped = sections.map((sec) => {
       if (sec.label !== "Academics") return sec;
       return {
         ...sec,
@@ -112,7 +113,9 @@ export function DrawerNavigation() {
         ),
       };
     });
-  }, [classesRes]);
+
+    return filterSectionsByRole(mapped, user);
+  }, [classesRes, user]);
 
   const isActive = (path, exact = false) => {
     if (path === "/backoffice" || exact) return pathname === path;
