@@ -6,6 +6,7 @@ import {
   AttendancePage,
   ClassMonthlyAttendancePage,
   ClassDailyAttendancePage,
+  FaceAttendancePage,
   StudentDetailsPage,
 } from "@/pages/Management/Students";
 import {
@@ -136,6 +137,10 @@ export const privateRoutes = [
       {
         path: "/attendance",
         element: <AttendancePage />,
+      },
+      {
+        path: "/attendance/face-scan",
+        element: <FaceAttendancePage />,
       },
       {
         path: "/fees",

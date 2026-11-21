@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Layers,
   Loader2,
+  ScanFace,
   UserCheck,
   Users,
   UserX,
@@ -74,6 +75,16 @@ function AttendancePage() {
         eyebrow={`Daily Operations · ${today}`}
         title="Attendance"
         description="Class-wise attendance overview. Select a class to view its monthly register or mark today's roll call."
+        actions={
+          <Button
+            asChild
+            className="gap-2 gradient-primary text-primary-foreground border-0 shadow-glow"
+          >
+            <Link to="/attendance/face-scan">
+              <ScanFace className="h-4 w-4" /> Face Scan Attendance
+            </Link>
+          </Button>
+        }
       />
 
       {/* Global Today Summary Cards */}
