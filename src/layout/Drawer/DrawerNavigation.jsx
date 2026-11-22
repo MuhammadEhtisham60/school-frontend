@@ -81,8 +81,8 @@ const sections = [
   { label: "Main", items: mainItems },
   { label: "Academics", items: academicItems },
   { label: "Operations", items: operationItems },
-  { label: "Administration", items: administrationItems },
   { label: "Resources", items: resourceItems },
+  { label: "Administration", items: administrationItems },
   { label: "Website", items: websiteItems },
 ];
 

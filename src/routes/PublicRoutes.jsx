@@ -1,5 +1,5 @@
 import React from "react";
-import Page from "@/pages/index";
+import LoginPage from "@/pages/auth/login";
 import {
   SiteLayout,
   SiteIndex,
@@ -14,7 +14,7 @@ import UnauthorizedPage from "@/pages/auth/unauthorized";
 export const publicRoutes = [
   {
     path: "/",
-    element: <Page />,
+    element: <LoginPage />,
   },
   {
     path: "/unauthorized",

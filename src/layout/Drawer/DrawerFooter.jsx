@@ -16,20 +16,20 @@ export function DrawerFooter({ collapsed, user, onLogout }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <SidebarFooter className="border-t p-2">
+    <SidebarFooter className="border-t border-sidebar-border p-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left hover:bg-sidebar-accent transition-smooth outline-none cursor-pointer">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground font-semibold text-sm">
               {initial}
             </div>
             {!collapsed && (
               <>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{email}</p>
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">{name}</p>
+                  <p className="text-[11px] text-sidebar-foreground/70 truncate">{email}</p>
                 </div>
-                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+                <ChevronUp className="h-4 w-4 text-sidebar-foreground/70 shrink-0" />
               </>
             )}
           </button>

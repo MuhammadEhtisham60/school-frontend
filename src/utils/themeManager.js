@@ -86,6 +86,18 @@ export const THEMES = [
       { label: "Dusty Mauve", hex: "#9d8189" },
     ],
   },
+  {
+    id: "school",
+    name: "School Theme",
+    description: "Login portal sky blue, deep navy, royal blue, and crest gold.",
+    swatches: [
+      { label: "Deep Navy", hex: "#0d254b" },
+      { label: "Royal Blue", hex: "#16489d" },
+      { label: "Sky Blue", hex: "#d7e8fa" },
+      { label: "Ice White", hex: "#f4f8fe" },
+      { label: "Crest Gold", hex: "#ebb400" },
+    ],
+  },
 ];
 
 export function getSavedTheme() {
@@ -243,6 +255,22 @@ const THEME_PDF_PALETTES = {
     inkHex: "#3f2d33",
     mutedRgb: [111, 87, 95],
     mutedHex: "#6f575f",
+  },
+  school: {
+    bannerRgb: [13, 37, 75],
+    bannerHex: "#0d254b",
+    accentRgb: [22, 72, 157],
+    accentHex: "#16489d",
+    softBgRgb: [215, 232, 250],
+    softBgHex: "#d7e8fa",
+    highlightRowRgb: [244, 248, 254],
+    highlightRowHex: "#f4f8fe",
+    borderRgb: [200, 214, 232],
+    borderHex: "#c8d6e8",
+    inkRgb: [13, 37, 75],
+    inkHex: "#0d254b",
+    mutedRgb: [61, 85, 120],
+    mutedHex: "#3d5578",
   },
 };
 
